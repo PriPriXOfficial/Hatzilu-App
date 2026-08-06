@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#04091a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Hatzilu"/>
+<title>Hatzilu</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#04091a;--red:#e8001c;--red2:#ff2035;--red3:#ff5566;
+  --gold:#f5c518;--white:#fff;--silver:#9cb0cc;--muted:#3d526e;
+  --success:#22d46a;--nav:rgba(4,8,20,.97);--card:rgba(255,255,255,.042);
+  --border:rgba(255,255,255,.075);--borderhi:rgba(255,255,255,.16);
+  --fd:'Bebas Neue',sans-serif;--fb:'Inter',sans-serif;
+  --spring:cubic-bezier(.34,1.56,.64,1);--eout:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--white);font-family:var(--fb);
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font-family:var(--fb);cursor:pointer;outline:none}
+.screen{display:none;flex-direction:column;height:100vh;height:100dvh}
+.screen.active{display:flex}
+
+/* HOME BG */
+#home{position:relative;overflow:hidden;
+  background:radial-gradient(ellipse 75% 42% at 50% 60%,rgba(220,0,20,.30) 0%,rgba(180,0,15,.12) 42%,transparent 68%),
+    radial-gradient(ellipse 110% 32% at 50% 102%,rgba(180,0,15,.24) 0%,transparent 58%),
+    linear-gradient(180deg,#08102a 0%,#05091c 38%,#060b1f 100%)}
+#home::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.013) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.013) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%)}
+
+/* TOP BAR */
+.topbar{position:relative;z-index:10;display:flex;align-items:center;
+  justify-content:space-between;padding:clamp(14px,4vw,22px) clamp(16px,5vw,26px) 0}
+
+/* LANGUAGE DROPDOWN BUTTON — replaces globe icon */
+.lang-dropdown-wrap{position:relative}
+.lang-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:8px 12px;
+  color:var(--silver);font-size:13px;font-weight:700;letter-spacing:.3px;
+  transition:all .2s var(--spring)}
+.lang-btn:hover{background:rgba(255,255,255,.12);border-color:var(--gold);color:var(--gold)}
+.lang-btn .arrow{font-size:10px;opacity:.7;transition:transform .2s}
+.lang-btn.open .arrow{transform:rotate(180deg)}
+.lang-flag{font-size:16px}
+.lang-name{font-size:12px}
+.lang-dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:#0d1b38;border:1.5px solid rgba(255,255,255,.14);
+  border-radius:14px;overflow:hidden;
+  box-shadow:0 12px 36px rgba(0,0,0,.6);
+  display:none;z-index:100;min-width:170px}
+.lang-dropdown.open{display:block}
+.lang-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;font-size:13px;font-weight:700;
+  color:var(--silver);border:none;background:none;width:100%;text-align:left;
+  transition:background .15s}
+.lang-opt:hover{background:rgba(255,255,255,.08);color:var(--white)}
+.lang-opt.active{background:rgba(245,197,24,.10);color:var(--gold)}
+.lang-opt .flag{font-size:18px}
+
+.t-menu{position:relative;width:50px;height:50px;
+  background:linear-gradient(145deg,#ff1f35,#c40018,#8c000f);border:none;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4.5px;
+  box-shadow:0 4px 18px rgba(232,0,28,.60),inset 0 1px 0 rgba(255,150,160,.28);
+  transition:all .22s var(--spring)}
+.t-menu span{display:block;width:18px;height:2.5px;background:rgba(255,255,255,.92);border-radius:2px}
+.t-menu:hover{transform:scale(1.08) translateY(-1px);box-shadow:0 8px 28px rgba(232,0,28,.80)}
+.t-menu:active{transform:scale(.95)}
+.t-badge{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:10px;
+  background:linear-gradient(135deg,#ff8800,#e06000);border:2px solid var(--bg);
+  font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 4px}
+
+/* TITLE */
+.title-block{position:relative;z-index:5;text-align:center;padding:clamp(2px,1vw,6px) 0 0}
+.title-h1{font-family:var(--fd);font-size:clamp(56px,16vw,96px);letter-spacing:6px;
+  color:#fff;line-height:.92;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(200,220,255,.4),0 3px 6px rgba(0,0,20,.7),0 6px 20px rgba(0,0,0,.5)}
+.title-sub{font-size:clamp(10px,2.5vw,13px);letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-top:4px;text-shadow:0 0 16px rgba(245,197,24,.35)}
+
+/* STATUS */
+.status-row{position:relative;z-index:5;display:flex;justify-content:center;gap:9px;
+  padding:clamp(4px,1.2vw,9px) 16px 0}
+.sp{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.038);
+  border:1px solid rgba(255,255,255,.065);border-radius:100px;padding:5px 12px;
+  font-size:10.5px;font-weight:700;color:var(--muted);transition:all .35s}
+.sp.on{color:var(--silver);border-color:rgba(255,255,255,.12)}
+.sdot{width:6px;height:6px;border-radius:50%;background:#1a2840;flex-shrink:0;transition:all .35s}
+.sdot.g{background:var(--success);box-shadow:0 0 7px var(--success)}
+.sdot.r{background:var(--red2);box-shadow:0 0 7px var(--red2);animation:blink 1.1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* SPHERE */
+.sphere-stage{position:relative;z-index:5;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.ring{position:absolute;border-radius:50%;border:1px solid;pointer-events:none;animation:ring-out 3.2s ease-out infinite}
+.ring:nth-child(1){width:min(75vw,330px);height:min(75vw,330px);border-color:rgba(232,0,28,.42)}
+.ring:nth-child(2){width:min(90vw,394px);height:min(90vw,394px);border-color:rgba(232,0,28,.20);animation-delay:1.06s}
+.ring:nth-child(3){width:min(105vw,460px);height:min(105vw,460px);border-color:rgba(232,0,28,.09);animation-delay:2.12s}
+@keyframes ring-out{0%{opacity:.9;transform:scale(.88)}100%{opacity:0;transform:scale(1.20)}}
+.orbit-dash{position:absolute;width:min(80vw,354px);height:min(80vw,354px);
+  border-radius:50%;border:1.5px dashed rgba(232,0,28,.20);pointer-events:none;animation:spin-cw 14s linear infinite}
+.orbit-dash2{position:absolute;width:min(86vw,378px);height:min(86vw,378px);
+  border-radius:50%;border:1px dashed rgba(232,0,28,.10);pointer-events:none;animation:spin-ccw 20s linear infinite}
+@keyframes spin-cw{to{transform:rotate(360deg)}}
+@keyframes spin-ccw{to{transform:rotate(-360deg)}}
+.spark{position:absolute;border-radius:50%;pointer-events:none;background:var(--red2);box-shadow:0 0 10px 3px rgba(255,30,50,.75)}
+.spark:nth-child(5){width:7px;height:7px;animation:orb 5s linear infinite}
+.spark:nth-child(6){width:5px;height:5px;animation:orb 5s linear infinite;animation-delay:-1.25s}
+.spark:nth-child(7){width:4px;height:4px;animation:orb 5s linear infinite;animation-delay:-2.5s}
+.spark:nth-child(8){width:6px;height:6px;animation:orb 5s linear infinite;animation-delay:-3.75s}
+@keyframes orb{0%{transform:rotate(0deg) translateX(min(38vw,168px)) rotate(0deg)}100%{transform:rotate(360deg) translateX(min(38vw,168px)) rotate(-360deg)}}
+.sphere-btn{
+  position:relative;width:min(62vw,268px);height:min(62vw,268px);border-radius:50%;border:none;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+  background:radial-gradient(circle at 34% 24%,rgba(255,145,145,.70) 0%,rgba(255,80,90,.38) 16%,transparent 42%),
+    radial-gradient(circle at 68% 18%,rgba(255,110,110,.20) 0%,transparent 28%),
+    radial-gradient(circle at 44% 38%,#ff2a3c 0%,#e8001c 28%,#c2001a 52%,#8a0010 74%,#4a0008 100%);
+  box-shadow:0 0 0 13px rgba(218,0,22,.17),0 0 0 30px rgba(218,0,22,.07),
+    0 22px 68px rgba(210,0,20,.82),0 8px 26px rgba(210,0,20,.60),0 48px 105px rgba(180,0,16,.48),0 42px 78px rgba(0,0,0,.58),
+    inset 0 -20px 48px rgba(0,0,0,.62),inset 0 9px 26px rgba(255,120,120,.20),inset 0 28px 55px rgba(0,0,0,.18);
+  transition:transform .13s var(--spring),box-shadow .16s var(--eout);
+  animation:breathe 3.8s ease-in-out infinite}
+.sphere-btn::before{content:'';position:absolute;top:7%;left:13%;width:44%;height:36%;
+  background:radial-gradient(ellipse at 38% 38%,rgba(255,255,255,.52) 0%,rgba(255,255,255,.18) 38%,transparent 72%);
+  border-radius:50%;pointer-events:none}
+.sphere-btn::after{content:'';position:absolute;bottom:3%;left:10%;width:80%;height:28%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.45) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 0 14px rgba(218,0,22,.18),0 0 0 32px rgba(218,0,22,.08),
+    0 22px 70px rgba(210,0,20,.85),0 8px 28px rgba(210,0,20,.62),0 50px 108px rgba(180,0,16,.50),0 44px 80px rgba(0,0,0,.60),
+    inset 0 -20px 48px rgba(0,0,0,.62),inset 0 9px 26px rgba(255,120,120,.22),inset 0 28px 55px rgba(0,0,0,.18)}
+  50%{box-shadow:0 0 0 26px rgba(232,0,28,.28),0 0 0 52px rgba(232,0,28,.11),0 0 0 80px rgba(232,0,28,.04),
+    0 32px 100px rgba(232,0,28,1.0),0 12px 38px rgba(232,0,28,.68),0 65px 135px rgba(200,0,20,.65),0 44px 80px rgba(0,0,0,.60),
+    inset 0 -20px 48px rgba(0,0,0,.62),inset 0 12px 32px rgba(255,150,150,.28),inset 0 28px 55px rgba(0,0,0,.18)}}
+.sphere-btn:hover{transform:translateY(-10px) scale(1.06);animation:none;
+  box-shadow:0 0 0 28px rgba(232,0,28,.35),0 0 0 56px rgba(232,0,28,.12),0 0 0 84px rgba(232,0,28,.05),
+    0 38px 120px rgba(232,0,28,1),0 14px 46px rgba(232,0,28,.70),0 75px 160px rgba(210,0,24,.68),0 60px 90px rgba(0,0,0,.55),
+    inset 0 -24px 56px rgba(0,0,0,.62),inset 0 12px 36px rgba(255,145,145,.30)}
+.sphere-btn:active{transform:translateY(7px) scale(.94);animation:none;
+  box-shadow:0 0 0 5px rgba(232,0,28,.45),0 6px 24px rgba(232,0,28,.78),0 18px 52px rgba(200,0,18,.48),inset 0 -12px 36px rgba(0,0,0,.72)}
+
+/* 3D ICON BUTTONS */
+.q-row{position:relative;z-index:5;display:flex;justify-content:center;
+  gap:clamp(18px,6vw,36px);padding:clamp(6px,2vw,14px) 24px 0}
+.q-btn{display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:none;border:none;transition:transform .22s var(--spring)}
+.q-btn:hover{transform:translateY(-6px) scale(1.10)}
+.q-btn:active{transform:scale(.90)}
+.q-shell{position:relative;width:clamp(60px,15vw,70px);height:clamp(60px,15vw,70px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;transition:box-shadow .22s var(--eout)}
+.q-shell::after{content:'';position:absolute;top:-10%;left:-60%;width:40%;height:120%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);
+  transform:skewX(-20deg);transition:left .5s ease;pointer-events:none}
+.q-btn:hover .q-shell::after{left:130%}
+.q-hi{position:absolute;top:8%;left:14%;width:36%;height:28%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.42) 0%,transparent 72%);
+  border-radius:50%;pointer-events:none;z-index:2}
+.q-red .q-shell{
+  background:radial-gradient(circle at 34% 26%,rgba(255,120,120,.55) 0%,transparent 38%),
+    radial-gradient(circle at 50% 50%,#ff2035,#cc0018,#7a000d);
+  box-shadow:0 6px 22px rgba(220,0,28,.62),0 0 0 2px rgba(255,60,80,.22),
+    inset 0 -7px 16px rgba(0,0,0,.45),inset 0 4px 10px rgba(255,100,100,.22)}
+.q-red:hover .q-shell{box-shadow:0 10px 36px rgba(232,0,28,.88),0 0 0 3px rgba(255,80,100,.32)}
+.q-dark .q-shell{
+  background:radial-gradient(circle at 32% 26%,rgba(80,100,150,.28) 0%,transparent 44%),
+    radial-gradient(circle at 50% 50%,#1e2d50,#0e1830,#080f22);
+  border:1.5px solid rgba(255,255,255,.10);
+  box-shadow:0 6px 22px rgba(0,0,0,.55),inset 0 -5px 14px rgba(0,0,0,.55)}
+.q-dark:hover .q-shell{border-color:rgba(255,255,255,.22);box-shadow:0 10px 32px rgba(0,0,0,.65)}
+.q-svg-icon{width:clamp(28px,7vw,34px);height:clamp(28px,7vw,34px);position:relative;z-index:3;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
+.q-lbl{font-size:clamp(11px,2.8vw,13px);font-weight:700;color:var(--silver);letter-spacing:.3px;text-align:center}
+.q-lbl.hi{color:#fff;position:relative}
+.q-lbl.hi::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:2px;background:var(--red);border-radius:2px}
+.q-bdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;
+  background:linear-gradient(135deg,#ff4400,#cc2200);border:2px solid var(--bg);
+  font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 3px}
+.q-btn.voice-active .q-shell{animation:vpulse 1.2s ease-in-out infinite}
+@keyframes vpulse{
+  0%,100%{box-shadow:0 6px 22px rgba(220,0,28,.62),0 0 0 2px rgba(255,60,80,.22)}
+  50%{box-shadow:0 8px 30px rgba(232,0,28,.90),0 0 0 12px rgba(232,0,28,.15),0 0 0 22px rgba(232,0,28,.05)}}
+
+/* BOTTOM NAV */
+.bnav{position:relative;z-index:10;display:flex;align-items:flex-end;justify-content:space-around;
+  background:var(--nav);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-top:1px solid rgba(255,255,255,.055);padding:10px 6px clamp(14px,5vw,30px)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:none;border:none;padding:8px 4px;border-radius:14px;
+  color:var(--muted);transition:all .2s var(--eout)}
+.bn:hover{color:var(--silver);background:rgba(255,255,255,.045)}
+.bn.active{color:#fff}
+.bn-ico{width:clamp(22px,5.5vw,27px);height:clamp(22px,5.5vw,27px);transition:transform .22s var(--spring)}
+.bn:hover .bn-ico{transform:scale(1.20) translateY(-2px)}
+.bn-lbl{font-size:clamp(9px,2.3vw,11px);font-weight:700;letter-spacing:.2px}
+.bn-c{flex:1.2;position:relative;margin-top:-22px}
+.bn-sos{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;width:100%;
+  transition:transform .22s var(--spring)}
+.bn-sos:hover{transform:translateY(-4px) scale(1.08)}
+.bn-sos:active{transform:scale(.93)}
+.bn-sos-ring{width:clamp(54px,13vw,64px);height:clamp(54px,13vw,64px);border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,120,120,.55) 0%,transparent 36%),
+    radial-gradient(circle at 50% 50%,#ff2035,#e0001c,#8a000f);
+  border:3.5px solid var(--bg);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:clamp(14px,4vw,18px);letter-spacing:1.5px;color:#fff;
+  box-shadow:0 4px 20px rgba(232,0,28,.72),inset 0 -5px 12px rgba(0,0,0,.52),inset 0 3px 8px rgba(255,110,110,.22);
+  transition:box-shadow .2s;position:relative}
+.bn-sos-ring::before{content:'';position:absolute;top:8%;left:14%;width:36%;height:28%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.38) 0%,transparent 72%);border-radius:50%}
+.bn-sos:hover .bn-sos-ring{box-shadow:0 8px 30px rgba(232,0,28,.92)}
+.bn-sos-lbl{font-size:clamp(9px,2.3vw,11px);font-weight:800;color:var(--red2);letter-spacing:.3px}
+
+/* LANG SELECT SCREEN */
+#langselect{background:linear-gradient(168deg,#0b1530 0%,#04091a 100%);
+  align-items:center;justify-content:center;padding:0 24px;gap:0}
+.ls-logo{font-family:var(--fd);font-size:clamp(48px,14vw,72px);letter-spacing:6px;color:#fff;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 3px 6px rgba(0,0,20,.7);text-align:center;margin-bottom:6px}
+.ls-sub{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);
+  font-weight:700;text-align:center;margin-bottom:28px}
+.ls-title{font-size:clamp(14px,4vw,18px);font-weight:800;color:var(--silver);text-align:center;margin-bottom:16px}
+.ls-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;width:100%;max-width:360px}
+.ls-btn{background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+  padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:all .22s var(--spring);color:var(--silver)}
+.ls-btn:hover{background:rgba(255,255,255,.09);border-color:var(--gold);color:var(--white);
+  transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ls-btn:active{transform:scale(.96)}
+.ls-flag{font-size:28px;line-height:1}
+.ls-name{font-size:13px;font-weight:800}
+.ls-nat{font-size:11px;font-weight:600;opacity:.7}
+
+/* INNER PAGES */
+.inner-screen{background:linear-gradient(168deg,#0b1530 0%,#04091a 100%)}
+.pg-hdr{display:flex;align-items:center;gap:14px;
+  padding:clamp(18px,4.5vw,26px) clamp(18px,5vw,26px) clamp(12px,3vw,18px);
+  background:rgba(255,255,255,.022);border-bottom:1px solid var(--border);flex-shrink:0}
+.pg-bk{width:50px;height:50px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--silver);transition:all .2s var(--spring)}
+.pg-bk:hover{background:rgba(255,255,255,.09);border-color:var(--gold);color:var(--gold);transform:scale(1.06)}
+.pg-ttl{font-family:var(--fd);font-size:clamp(26px,7vw,38px);letter-spacing:4px;
+  color:var(--gold);text-shadow:0 0 20px rgba(245,197,24,.3)}
+.pg-body{flex:1;overflow-y:auto;padding:clamp(14px,4vw,20px);
+  padding-bottom:36px;display:flex;flex-direction:column;gap:12px}
+.pg-body::-webkit-scrollbar{width:3px}
+.pg-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:clamp(16px,4vw,20px);transition:border-color .2s}
+.scard:hover{border-color:var(--borderhi)}
+.sc-ttl{font-size:11px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.flbl{display:block;font-size:13px;font-weight:700;color:var(--silver);margin-bottom:8px}
+.finp{width:100%;background:rgba(0,0,0,.38);border:1.5px solid rgba(255,255,255,.10);
+  border-radius:13px;color:#fff;font-size:16px;font-family:var(--fb);font-weight:600;
+  padding:13px 15px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.finp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,24,.12)}
+select.finp{cursor:pointer}
+option{background:#0b1530;color:#fff}
+.fg{margin-bottom:12px}
+.cg{display:flex;flex-direction:column;gap:9px}
+.crow{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:center}
+.crow .finp{font-size:14px;padding:11px 12px}
+.cdel{width:44px;height:44px;flex-shrink:0;background:rgba(232,0,28,.10);
+  border:1.5px solid rgba(232,0,28,.26);border-radius:11px;color:#ff5566;font-size:18px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s var(--spring)}
+.cdel:hover{background:rgba(232,0,28,.22);transform:scale(1.10)}
+.cadd{width:100%;margin-top:9px;background:transparent;
+  border:2px dashed rgba(255,255,255,.11);border-radius:13px;
+  color:var(--muted);font-size:15px;font-weight:700;font-family:var(--fb);
+  padding:13px;transition:all .22s}
+.cadd:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.04)}
+.info-box{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.065);
+  border-radius:13px;padding:14px 15px;font-size:13px;color:var(--silver);
+  line-height:1.75;font-weight:600;white-space:pre-line}
+.sv-btn{width:100%;background:linear-gradient(150deg,#ff2035 0%,#e8001c 40%,#950010 100%);
+  border:none;border-radius:18px;color:#fff;font-size:18px;font-weight:800;
+  font-family:var(--fd);letter-spacing:4px;padding:19px;
+  box-shadow:0 6px 26px rgba(232,0,28,.46),inset 0 1px 0 rgba(255,150,160,.30);
+  transition:all .22s var(--spring)}
+.sv-btn:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 12px 38px rgba(232,0,28,.66)}
+.sv-btn:active{transform:translateY(2px) scale(.98)}
+
+/* VOICE PAGE */
+.vp-status-card{display:flex;flex-direction:column;align-items:center;gap:14px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 20px}
+.vp-orb{width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,120,120,.55) 0%,transparent 36%),
+    radial-gradient(circle at 50% 50%,#ff2035,#e0001c,#8a000f);
+  display:flex;align-items:center;justify-content:center;border:none;
+  box-shadow:0 6px 24px rgba(232,0,28,.55),inset 0 -5px 12px rgba(0,0,0,.5);
+  transition:all .22s var(--spring)}
+.vp-orb:hover{transform:scale(1.08)}
+.vp-orb.on{animation:orb-pulse 1.3s ease-in-out infinite}
+@keyframes orb-pulse{0%,100%{box-shadow:0 6px 24px rgba(232,0,28,.55),0 0 0 0 rgba(232,0,28,.4)}50%{box-shadow:0 10px 36px rgba(232,0,28,.85),0 0 0 18px rgba(232,0,28,0)}}
+.vp-stat-txt{font-size:16px;font-weight:800;color:var(--silver);text-align:center}
+.vp-phrase-show{font-size:20px;font-weight:900;color:var(--gold);text-align:center}
+.vp-transcript{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:13px;
+  padding:14px;font-size:13px;color:var(--silver);min-height:52px;font-weight:600;
+  line-height:1.6;word-break:break-word}
+.toggle-btn{width:100%;padding:16px;border-radius:14px;border:none;
+  font-size:16px;font-weight:800;font-family:var(--fb);letter-spacing:.5px;transition:all .22s var(--spring)}
+.toggle-btn.off{background:rgba(232,0,28,.12);border:2px solid rgba(232,0,28,.3);color:var(--red3)}
+.toggle-btn.off:hover{background:rgba(232,0,28,.22);border-color:var(--red)}
+.toggle-btn.on{background:linear-gradient(135deg,#ff2035,#aa0010);color:#fff;box-shadow:0 6px 22px rgba(232,0,28,.45)}
+.toggle-btn.on:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(232,0,28,.65)}
+
+/* BG STATUS BADGE */
+.bg-badge{
+  position:fixed;bottom:90px;right:14px;z-index:50;
+  background:rgba(34,212,106,.15);border:1.5px solid rgba(34,212,106,.4);
+  border-radius:20px;padding:6px 12px;
+  font-size:11px;font-weight:800;color:var(--success);
+  display:none;align-items:center;gap:6px;letter-spacing:.5px}
+.bg-badge.show{display:flex}
+.bg-dot{width:7px;height:7px;border-radius:50%;background:var(--success);
+  box-shadow:0 0 6px var(--success);animation:blink 1.5s ease infinite}
+
+/* ALERT OVERLAY */
+#aov{display:none;position:fixed;inset:0;z-index:999;
+  background:radial-gradient(ellipse at 50% 40%,rgba(200,0,22,.96) 0%,rgba(70,0,8,.99) 100%);
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:28px 22px;animation:aov-in .36s var(--eout)}
+#aov.show{display:flex}
+@keyframes aov-in{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+.aov-ic{font-size:64px;animation:shk .5s ease 3}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-15px) rotate(-5deg)}75%{transform:translateX(15px) rotate(5deg)}}
+.aov-ttl{font-family:var(--fd);font-size:clamp(38px,11vw,60px);letter-spacing:6px;color:#fff}
+.aov-msg{font-size:14px;font-weight:600;color:rgba(255,255,255,.86);text-align:center;line-height:1.55;max-width:340px}
+.aov-steps{display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px;max-height:200px;overflow-y:auto}
+.aov-steps::-webkit-scrollbar{width:3px}
+.aov-steps::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+.aov-step{display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.17);
+  border-radius:13px;padding:12px 16px;font-size:14px;font-weight:700;color:#fff;
+  text-decoration:none;transition:all .2s}
+.aov-step:hover{background:rgba(255,255,255,.17)}
+.aov-step.done{border-color:var(--success);background:rgba(34,212,106,.10)}
+.aov-step span:first-child{font-size:18px;flex-shrink:0}
+.aov-dis{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.28);
+  border-radius:14px;color:#fff;font-size:15px;font-weight:800;font-family:var(--fb);
+  padding:13px 38px;transition:all .2s}
+.aov-dis:hover{background:rgba(255,255,255,.22);transform:scale(1.04)}
+
+
+/* Minimize nav button special */
+.bn-minimize .bn-ico rect { transition: all .2s; }
+.bn-minimize:hover .bn-ico rect { filter: drop-shadow(0 0 4px rgba(200,50,50,0.8)); }
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(72px);
+  background:#0e1c38;border:1.5px solid var(--gold);border-radius:13px;
+  color:#fff;font-size:14px;font-weight:700;padding:12px 22px;z-index:1000;
+  transition:transform .36s var(--spring);white-space:nowrap;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND RUNNING BADGE -->
+<div class="bg-badge" id="bgBadge">
+  <div class="bg-dot"></div>
+  <span id="bgBadgeTxt">Running in background</span>
+</div>
+
+<!-- LANGUAGE SELECT -->
+<div id="langselect" class="screen">
+  <div class="ls-logo">Hatzilu</div>
+  <div class="ls-sub">Emergency Situation Alert</div>
+  <div class="ls-title" id="ls-title">Choose Your Language</div>
+  <div class="ls-grid">
+    <button class="ls-btn" onclick="selectLang('en')"><span class="ls-flag">&#x1F1EC;&#x1F1E7;</span><span class="ls-name">English</span><span class="ls-nat">English</span></button>
+    <button class="ls-btn" onclick="selectLang('ta')"><span class="ls-flag">&#x1F1EE;&#x1F1F3;</span><span class="ls-name">Tamil</span><span class="ls-nat">&#3078;&#3019;&#3007;&#2996;&#3021;</span></button>
+    <button class="ls-btn" onclick="selectLang('ml')"><span class="ls-flag">&#x1F1EE;&#x1F1F3;</span><span class="ls-name">Malayalam</span><span class="ls-nat">&#3374;&#3378;&#3375;&#3390;&#3379;&#3330;</span></button>
+    <button class="ls-btn" onclick="selectLang('hi')"><span class="ls-flag">&#x1F1EE;&#x1F1F3;</span><span class="ls-name">Hindi</span><span class="ls-nat">&#2361;&#2367;&#2306;&#2342;&#2368;</span></button>
+    <button class="ls-btn" onclick="selectLang('te')"><span class="ls-flag">&#x1F1EE;&#x1F1F3;</span><span class="ls-name">Telugu</span><span class="ls-nat">&#3108;&#3142;&#3122;&#3137;&#3095;&#3137;</span></button>
+    <button class="ls-btn" onclick="selectLang('kn')"><span class="ls-flag">&#x1F1EE;&#x1F1F3;</span><span class="ls-name">Kannada</span><span class="ls-nat">&#3221;&#3240;&#3277;&#3240;&#3233;</span></button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="topbar">
+    <!-- Language dropdown replaces globe icon -->
+    <div class="lang-dropdown-wrap">
+      <button class="lang-btn" id="langDropBtn" onclick="toggleLangDrop()">
+        <span class="lang-flag" id="langFlag">&#x1F1EC;&#x1F1E7;</span>
+        <span class="lang-name" id="langName">EN</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="lang-dropdown" id="langDrop">
+        <button class="lang-opt" onclick="selectLangDrop('en')"><span class="flag">&#x1F1EC;&#x1F1E7;</span> English</button>
+        <button class="lang-opt" onclick="selectLangDrop('ta')"><span class="flag">&#x1F1EE;&#x1F1F3;</span> &#3078;&#3019;&#3007;&#2996;&#3021;</button>
+        <button class="lang-opt" onclick="selectLangDrop('ml')"><span class="flag">&#x1F1EE;&#x1F1F3;</span> &#3374;&#3378;&#3375;&#3390;&#3379;&#3330;</button>
+        <button class="lang-opt" onclick="selectLangDrop('hi')"><span class="flag">&#x1F1EE;&#x1F1F3;</span> &#2361;&#2367;&#2306;&#2342;&#2368;</button>
+        <button class="lang-opt" onclick="selectLangDrop('te')"><span class="flag">&#x1F1EE;&#x1F1F3;</span> &#3108;&#3142;&#3122;&#3137;&#3095;&#3137;</button>
+        <button class="lang-opt" onclick="selectLangDrop('kn')"><span class="flag">&#x1F1EE;&#x1F1F3;</span> &#3221;&#3240;&#3277;&#3240;&#3233;</button>
+      </div>
+    </div>
+    <button class="t-menu" onclick="showScreen('settings')">
+      <span></span><span></span><span></span>
+      <div class="t-badge" id="cBadge">0</div>
+    </button>
+  </div>
+
+  <div class="title-block">
+    <div class="title-h1">Hatzilu</div>
+    <div class="title-sub" id="ui-subtitle">Emergency Situation Alert</div>
+  </div>
+  <div class="status-row">
+    <div class="sp" id="locPill"><span class="sdot" id="locDot"></span><span id="locTxt">GPS off</span></div>
+    <div class="sp" id="micPill"><span class="sdot" id="micDot"></span><span id="micTxt">Voice off</span></div>
+  </div>
+
+  <div class="sphere-stage">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="orbit-dash"></div><div class="orbit-dash2"></div>
+    <div class="spark"></div><div class="spark"></div><div class="spark"></div><div class="spark"></div>
+    <button class="sphere-btn" id="mainBtn" aria-label="Emergency"></button>
+  </div>
+
+  <div class="q-row">
+    <button class="q-btn q-red" id="micBtn">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <div class="q-bdg" id="micBdg" style="display:none">&#9679;</div>
+        <svg class="q-svg-icon" id="micSvgIcon" viewBox="0 0 48 48" fill="none">
+          <!-- Mic body 3D -->
+          <defs>
+            <radialGradient id="mg" cx="35%" cy="28%" r="65%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="60%" stop-color="#dddddd"/>
+              <stop offset="100%" stop-color="#aaaaaa"/>
+            </radialGradient>
+          </defs>
+          <rect x="16" y="4" width="16" height="24" rx="8" fill="url(#mg)"/>
+          <ellipse cx="21" cy="10" rx="3" ry="5" fill="rgba(255,255,255,0.5)" transform="rotate(-15 21 10)"/>
+          <line x1="20" y1="18" x2="28" y2="18" stroke="rgba(0,0,0,0.15)" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="19" y1="21" x2="29" y2="21" stroke="rgba(0,0,0,0.15)" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+          <line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="16" y1="44" x2="32" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="37" cy="8" r="5" fill="#ff2035" opacity="0.9"/>
+          <circle cx="37" cy="8" r="2.5" fill="#ffaaaa"/>
+        </svg>
+      </div>
+      <span class="q-lbl hi" id="ui-q1">Start Voice</span>
+    </button>
+    <button class="q-btn q-red" id="testBtn">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <svg class="q-svg-icon" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4C16 8 12 14 12 24v8l-4 4h32l-4-4v-8C36 14 32 8 24 4Z" fill="#FFD700"/>
+          <ellipse cx="19" cy="10" rx="3" ry="5" fill="rgba(255,255,255,0.28)" transform="rotate(-22 19 10)"/>
+          <circle cx="24" cy="41.5" r="3.5" fill="#FFD700" opacity="0.8"/>
+        </svg>
+      </div>
+      <span class="q-lbl" id="ui-q2">Test Alert</span>
+    </button>
+    <button class="q-btn q-dark" onclick="showScreen('settings')">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <svg class="q-svg-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="6.5" fill="#c8d8f0" opacity="0.92"/>
+          <path d="M38.5 20.8l-2.9-1.1a13.2 13.2 0 00-1.1-2.7l1.2-2.9-3.8-3.8-2.9 1.2a13 13 0 00-2.7-1.1L25.2 7.5h-5.4l-1.1 2.9a13 13 0 00-2.7 1.1L13.1 10.3 9.3 14.1l1.2 2.9a13.2 13.2 0 00-1.1 2.7l-2.9 1.1v5.4l2.9 1.1a13 13 0 001.1 2.7l-1.2 2.9 3.8 3.8 2.9-1.2a13 13 0 002.7 1.1l1.1 2.9h5.4l1.1-2.9a13.2 13.2 0 002.7-1.1l2.9 1.2 3.8-3.8-1.2-2.9a13 13 0 001.1-2.7l2.9-1.1Z" fill="#8aacd0" opacity="0.78"/>
+        </svg>
+      </div>
+      <span class="q-lbl" id="ui-q3">Settings</span>
+    </button>
+  </div>
+
+  <div class="bnav">
+    <button class="bn active" onclick="showScreen('home')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none"><path d="M3 12.5L14 3.5l11 9v11a1 1 0 01-1 1H17v-6h-6v6H4a1 1 0 01-1-1Z" fill="#f5a623" opacity="0.88"/></svg>
+      <span class="bn-lbl" id="ui-nav1">Home</span>
+    </button>
+    <button class="bn bn-minimize" onclick="minimizeApp()">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="12" width="20" height="3" rx="1.5" fill="#cc3333"/>
+        <rect x="4" y="18" width="14" height="3" rx="1.5" fill="#cc3333" opacity="0.7"/>
+      </svg>
+      <span class="bn-lbl" id="ui-nav2">Minimize</span>
+    </button>
+    <div class="bn-c">
+      <button class="bn-sos" onclick="triggerAlert('button')">
+        <div class="bn-sos-ring">SOS</div>
+        <span class="bn-sos-lbl" id="ui-nav3">Instant</span>
+      </button>
+    </div>
+    <button class="bn" onclick="showScreen('contactpage')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="3" width="20" height="22" rx="2" fill="#d4b896" opacity="0.8"/>
+        <rect x="7.5" y="7.5" width="13" height="1.8" rx="1" fill="#7a5a3a"/>
+        <rect x="7.5" y="11.5" width="13" height="1.8" rx="1" fill="#7a5a3a"/>
+        <rect x="7.5" y="15.5" width="9" height="1.8" rx="1" fill="#7a5a3a"/>
+        <circle cx="22" cy="22" r="4" fill="#e8001c"/>
+        <text x="22" y="25.5" text-anchor="middle" font-size="5.5" font-weight="900" fill="white">!</text>
+      </svg>
+      <span class="bn-lbl" id="ui-nav4">Contacts</span>
+    </button>
+    <button class="bn" onclick="showScreen('settings')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="9.5" r="4.5" fill="#a890d0" opacity="0.88"/>
+        <path d="M4.5 24.5c0-5 4-8.5 9.5-8.5s9.5 3.5 9.5 8.5" fill="#a890d0" opacity="0.72"/>
+      </svg>
+      <span class="bn-lbl" id="ui-nav5">Profile</span>
+    </button>
+  </div>
+</div>
+
+<!-- VOICE PAGE -->
+<div id="voicepage" class="screen inner-screen">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="showScreen('home')">&#9664;</button>
+    <div class="pg-ttl" id="ui-vp-title">&#127908; VOICE</div>
+  </div>
+  <div class="pg-body">
+    <div class="vp-status-card">
+      <button class="vp-orb" id="vpOrb" onclick="toggleVoice()">
+        <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+          <rect x="17" y="4" width="14" height="22" rx="7" fill="white"/>
+          <path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="17" y1="44" x2="31" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="vp-stat-txt" id="vp-stat">Voice Detection OFF</div>
+      <div class="vp-phrase-show" id="vp-phrase-show">"help me"</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-vp-transcript-title">&#128225; Live Transcript</div>
+      <div class="vp-transcript" id="vpTranscript">--</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-vp-settings-title">&#9881; Voice Settings</div>
+      <div class="fg">
+        <label class="flbl" id="ui-vp-lang-lbl">Recognition Language</label>
+        <select class="finp" id="vpLang">
+          <option value="en-IN">English (India)</option>
+          <option value="ta-IN">Tamil</option>
+          <option value="ml-IN">Malayalam</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="te-IN">Telugu</option>
+          <option value="kn-IN">Kannada</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </div>
+      <div>
+        <label class="flbl" id="ui-vp-phrase-lbl">Activation Phrase</label>
+        <input class="finp" type="text" id="vpWord" placeholder="help me"/>
+        <div style="font-size:12px;color:var(--muted);margin-top:7px;font-weight:600" id="ui-vp-hint">Say this phrase - alert sends AUTOMATICALLY</div>
+      </div>
+    </div>
+    <button class="toggle-btn off" id="vpToggleBtn" onclick="toggleVoice()">&#127908; START VOICE DETECTION</button>
+    <button class="sv-btn" onclick="saveVoiceSettings()">&#128190; <span id="ui-vp-save">SAVE VOICE SETTINGS</span></button>
+  </div>
+</div>
+
+<!-- CONTACTS PAGE -->
+<div id="contactpage" class="screen inner-screen">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="showScreen('home')">&#9664;</button>
+    <div class="pg-ttl" id="ui-cp-title">&#128222; CONTACTS</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl"><span id="ui-cp-card-title">Emergency Contacts</span> <span style="color:var(--muted);font-weight:600;font-size:10px">MAX 7</span></div>
+      <div class="cg" id="cpList"></div>
+      <button class="cadd" id="cpAddBtn" onclick="addContact()">&#65291; <span id="ui-cp-add">Add Contact</span></button>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-cp-info-title">&#8505;&#65039; How Alerts Work</div>
+      <div class="info-box" id="ui-cp-info">When EMERGENCY triggers:
+&#128222; Auto-CALL 1st contact immediately
+&#128172; WhatsApp all contacts automatically
+&#128241; SMS all contacts automatically
+&#128205; GPS location included
+&#9889; 100% Automatic - zero clicks needed</div>
+    </div>
+    <button class="sv-btn" onclick="saveContacts()">&#128190; <span id="ui-cp-save">SAVE CONTACTS</span></button>
+  </div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="settings" class="screen inner-screen">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="showScreen('home')">&#9664;</button>
+    <div class="pg-ttl" id="ui-settings-title">&#9881; SETTINGS</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl">&#127760; <span id="ui-lang-title">App Language</span></div>
+      <select class="finp" id="appLang" onchange="applyLang(this.value,true)">
+        <option value="en">English</option>
+        <option value="ta">Tamil</option>
+        <option value="ml">Malayalam</option>
+        <option value="hi">Hindi</option>
+        <option value="te">Telugu</option>
+        <option value="kn">Kannada</option>
+      </select>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl">&#128100; <span id="ui-name-title">Your Name</span></div>
+      <label class="flbl" id="ui-name-lbl">Name shown in alert message</label>
+      <input class="finp" type="text" id="uName" placeholder="Amma, Thatha..."/>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl">&#128172; <span id="ui-preview-title">Alert Preview</span></div>
+      <div class="info-box">&#128680; EMERGENCY! <span id="pName">Your Name</span> needs HELP!
+&#128205; [GPS Location - Google Maps]
+&#8987; [Auto timestamp]
+Please respond IMMEDIATELY! &#128591;</div>
+    </div>
+    <button class="sv-btn" onclick="saveSettings()">&#128190; <span id="ui-save">SAVE SETTINGS</span></button>
+  </div>
+</div>
+
+<!-- ALERT OVERLAY -->
+<div id="aov">
+  <div class="aov-ic">&#128680;</div>
+  <div class="aov-ttl" id="aov-title">ALERT SENT!</div>
+  <div class="aov-msg" id="aovMsg">Alerting contacts...</div>
+  <div class="aov-steps" id="aovSteps"></div>
+  <button class="aov-dis" onclick="dismissAlert()" id="ui-dismiss">&#10003; DISMISS</button>
+</div>
+<div id="toast"></div>
+
+<script>
+/* LANGUAGE DICTIONARY */
+const LANG={
+en:{subtitle:"Emergency Situation Alert",q1:"Start Voice",q2:"Test Alert",q3:"Settings",nav1:"Home",nav2:"Minimize",nav3:"Instant",nav4:"Contacts",nav5:"Profile",settingsTitle:"\u2699 SETTINGS",langTitle:"App Language",nameTitle:"Your Name",nameLbl:"Name shown in alert",previewTitle:"Alert Preview",save:"SAVE SETTINGS",dismiss:"\u2713 DISMISS",alertSent:"ALERT SENT!",alertMsg:"Auto-alerting all contacts...",voiceOff:"Voice off",voiceOn:"Voice ON \u2013 Listening",gpsReady:"GPS ready",gpsOff:"GPS off",saved:"\u2705 Saved!",noContacts:"No contacts! Go to Contacts page.",testMode:"\uD83D\uDD14 TEST MODE \u2013 No real messages sent",vpTitle:"\uD83C\uDFA4 VOICE",vpTransTitle:"\uD83D\uDCE1 Live Transcript",vpSetTitle:"\u2699 Voice Settings",vpLangLbl:"Recognition Language",vpPhraseLbl:"Activation Phrase",vpHint:"Say this phrase \u2192 alert fires AUTOMATICALLY",vpStart:"\uD83C\uDFA4 START VOICE DETECTION",vpStop:"\u23F9 STOP VOICE DETECTION",vpSave:"SAVE VOICE SETTINGS",vpOff:"Voice Detection OFF \u2013 Tap orb to start",vpOn:"Listening... Say your phrase!",cpTitle:"\uD83D\uDCDE CONTACTS",cpCard:"Emergency Contacts",cpAdd:"Add Contact",cpInfoTitle:"\u2139\uFE0F How Alerts Work",cpInfo:"When EMERGENCY triggers:\n\uD83D\uDCDE Auto-CALL 1st contact immediately\n\uD83D\uDCAC WhatsApp all contacts automatically\n\uD83D\uDCF1 SMS all contacts automatically\n\uD83D\uDCCD GPS location included\n\u26A1 100% Automatic \u2013 zero clicks needed",cpSave:"SAVE CONTACTS",bgRunning:"Active in background",langShort:"EN",langFlag:"\uD83C\uDDEC\uD83C\uDDE7",msg:(n,url,t)=>`\uD83D\uDEA8 EMERGENCY ALERT!\n${n} needs IMMEDIATE HELP!\n\uD83D\uDCCD Location: ${url}\n\u23F0 ${t}\nPlease respond IMMEDIATELY! \uD83D\uDE4F`},
+ta:{subtitle:"\u0BAE\u0BC2\u0BA4\u0BCD\u0BA4\u0BCB\u0BB0\u0BCD \u0B85\u0BB5\u0B9A\u0BB0 \u0B8E\u0B9A\u0BCD\u0B9A\u0BB0\u0BBF\u0B95\u0BCD\u0B95\u0BC8",q1:"Start Voice",q2:"\u0B9A\u0BCB\u0BA4\u0BA9\u0BC8",q3:"\u0B85\u0BAE\u0BC8\u0BAA\u0BCD\u0BAA\u0BC1",nav1:"\u0BAE\u0BC1\u0B95\u0BAA\u0BCD\u0BAA\u0BC1",nav2:"Minimize",nav3:"Instant",nav4:"\u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1",nav5:"\u0B89\u0BB3\u0BCD\u0BA8\u0BC1\u0BB4\u0BC8",settingsTitle:"\u2699 \u0B85\u0BAE\u0BC8\u0BAA\u0BCD\u0BAA\u0BC1\u0B95\u0BB3\u0BCD",langTitle:"\u0BAA\u0BAF\u0BA9\u0BCD\u0BAA\u0BBE\u0B9F\u0BCD\u0B9F\u0BC1 \u0BAE\u0BCA\u0BB4\u0BBF",nameTitle:"\u0B89\u0B99\u0BCD\u0B95\u0BB3\u0BCD \u0BAA\u0BC6\u0BAF\u0BB0\u0BCD",nameLbl:"\u0B8E\u0B9A\u0BCD\u0B9A\u0BB0\u0BBF\u0B95\u0BCD\u0B95\u0BC8\u0BAF\u0BBF\u0BB2\u0BCD \u0BAA\u0BC6\u0BAF\u0BB0\u0BCD",previewTitle:"\u0B8E\u0B9A\u0BCD\u0B9A\u0BB0\u0BBF\u0B95\u0BCD\u0B95\u0BC8 \u0BAE\u0BC1\u0BA9\u0BCD\u0BA9\u0BCB\u0B9F\u0BCD\u0B9F\u0BAE\u0BCD",save:"\u0B9A\u0BC7\u0BAE\u0BBF\u0B95\u0BCD\u0B95\u0BB5\u0BC1\u0BAE\u0BCD",dismiss:"\u2713 \u0BAE\u0BC2\u0B9F\u0BB5\u0BC1\u0BAE\u0BCD",alertSent:"\u0B85\u0BB5\u0B9A\u0BB0\u0BAE\u0BCD \u0B85\u0BA9\u0BC1\u0BAA\u0BCD\u0BAA\u0BAA\u0BCD\u0BAA\u0B9F\u0BCD\u0B9F\u0BA4\u0BC1!",alertMsg:"\u0BA4\u0BB3\u0BCD\u0BB3\u0BCD \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1\u0B95\u0BB3\u0BC8 \u0B85\u0BB4\u0BC8\u0B95\u0BCD\u0B95\u0BBF\u0BB1\u0BCB\u0BAE\u0BCD...",voiceOff:"\u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B85\u0BA3\u0BC8\u0BA8\u0BA4\u0BC1",voiceOn:"\u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B87\u0BAF\u0B99\u0BCD\u0B95\u0BC1\u0B95\u0BBF\u0BB1\u0BA4\u0BC1",gpsReady:"GPS \u0BA4\u0BAF\u0BBE\u0BB0\u0BCD",gpsOff:"GPS \u0B87\u0BB2\u0BCD\u0BB3\u0BC8",saved:"\u2705 \u0B9A\u0BC7\u0BAE\u0BBF\u0B95\u0BCD\u0B95\u0BAA\u0BCD\u0BAA\u0B9F\u0BCD\u0B9F\u0BA4\u0BC1!",noContacts:"\u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1 \u0B87\u0BB2\u0BCD\u0BB3\u0BC8!",testMode:"\uD83D\uDD14 \u0B9A\u0BCB\u0BA4\u0BA9\u0BC8",vpTitle:"\uD83C\uDFA4 \u0B95\u0BC1\u0BB0\u0BB2\u0BCD",vpTransTitle:"\uD83D\uDCE1 \u0BA8\u0BC7\u0BB0\u0B9F\u0BBF \u0B95\u0BC1\u0BB0\u0BB2\u0BCD",vpSetTitle:"\u2699 \u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B85\u0BAE\u0BC8\u0BAA\u0BCD\u0BAA\u0BC1",vpLangLbl:"\u0B85\u0B99\u0BCD\u0B95\u0BC0\u0B95\u0BBE\u0BB0 \u0BAE\u0BCA\u0BB4\u0BBF",vpPhraseLbl:"\u0B9A\u0BC6\u0BAF\u0BB2\u0BCD\u0BAA\u0B9F\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1\u0BAE\u0BCD \u0BB5\u0BBE\u0BB0\u0BCD\u0BA4\u0BCD\u0BA4\u0BC8",vpHint:"\u0B87\u0BA8\u0BCD\u0BA4 \u0BB5\u0BBE\u0BB0\u0BCD\u0BA4\u0BCD\u0BA4\u0BC8\u0BAF\u0BC8 \u0B9A\u0BCA\u0BA9\u0BCD\u0BA9\u0BBE\u0BB2\u0BCD \u0BA4\u0BBE\u0BA9\u0BBE\u0B95 alert \u0BAA\u0BCB\u0B95\u0BC1\u0BAE\u0BCD",vpStart:"\uD83C\uDFA4 \u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0BA4\u0BCA\u0B9F\u0B99\u0BCD\u0B95\u0BC1",vpStop:"\u23F9 \u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0BA8\u0BBF\u0BB1\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1",vpSave:"\u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B9A\u0BC7\u0BAE\u0BBF\u0B95\u0BCD\u0B95\u0BB5\u0BC1\u0BAE\u0BCD",vpOff:"\u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B95\u0BA3\u0BCD\u0B9F\u0BB1\u0BBF\u0BA4\u0BB2\u0BCD \u0B85\u0BA3\u0BC8\u0BB5\u0BC1",vpOn:"\u0B95\u0BC1\u0BB0\u0BB2\u0BCD \u0B95\u0BC7\u0B9F\u0BCD\u0B95\u0BBF\u0BB1\u0BC1...",cpTitle:"\uD83D\uDCDE \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1\u0B95\u0BB3\u0BCD",cpCard:"\u0B85\u0BB5\u0B9A\u0BB0 \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1\u0B95\u0BB3\u0BCD",cpAdd:"\u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1 \u0B9A\u0BC7\u0BB0\u0BCD\u0B95\u0BCD\u0B95\u0BB5\u0BC1\u0BAE\u0BCD",cpInfoTitle:"\u2139\uFE0F \u0B8E\u0BAA\u0BCD\u0BAA\u0B9F\u0BBF \u0B9A\u0BC6\u0BAF\u0BB2\u0BCD\u0BAA\u0B9F\u0BC1\u0BAE\u0BCD",cpInfo:"\u0B85\u0BB5\u0B9A\u0BB0\u0BAE\u0BCD \u0B87\u0BAF\u0B99\u0BCD\u0B95\u0BC1\u0BAE\u0BCD\u0BAA\u0BCB\u0BA4\u0BC1:\n\uD83D\uDCDE 1\u0BAE\u0BCD \u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1\u0B95\u0BC1 \u0BA4\u0BBE\u0BA9\u0BBE\u0B95 Call\n\uD83D\uDCAC WhatsApp \u0B8E\u0BB2\u0BCD\u0BB2\u0BBE\u0BB0\u0BC1\u0B95\u0BCD\u0B95\u0BC1\u0BAE\u0BCD\n\uD83D\uDCF1 SMS \u0B8E\u0BB2\u0BCD\u0BB2\u0BBE\u0BB0\u0BC1\u0B95\u0BCD\u0B95\u0BC1\u0BAE\u0BCD\n\uD83D\uDCCD GPS \u0B87\u0B9F\u0BAE\u0BCD\n\u26A1 \u0BA4\u0BBE\u0BA9\u0BBE\u0B95 \u0BA8\u0B9F\u0B95\u0BCD\u0B95\u0BC1\u0BAE\u0BCD",cpSave:"\u0BA4\u0BCA\u0B9F\u0BB0\u0BCD\u0BAA\u0BC1\u0B95\u0BB3\u0BCD \u0B9A\u0BC7\u0BAE\u0BBF\u0B95\u0BCD\u0B95\u0BB5\u0BC1\u0BAE\u0BCD",bgRunning:"\u0BAA\u0BBF\u0BA9\u0BA3\u0BBF\u0BAF\u0BBF\u0BB2\u0BCD \u0B87\u0BAF\u0B99\u0BCD\u0B95\u0BC1\u0B95\u0BBF\u0BB1\u0BA4\u0BC1",langShort:"TA",langFlag:"\uD83C\uDDEE\uD83C\uDDF3",msg:(n,url,t)=>`\uD83D\uDEA8 \u0B85\u0BB5\u0B9A\u0BB0 \u0B8E\u0B9A\u0BCD\u0B9A\u0BB0\u0BBF\u0B95\u0BCD\u0B95\u0BC8!\n${n}-\u0B95\u0BCD\u0B95\u0BC1 \u0B89\u0B9F\u0BA9\u0B9F\u0BBF \u0B89\u0BA4\u0BB5\u0BBF \u0BA4\u0BC7\u0BB5\u0BC8!\n\uD83D\uDCCD \u0B87\u0B9F\u0BAE\u0BCD: ${url}\n\u23F0 ${t}\n\u0BA4\u0BAF\u0BB5\u0BC1\u0B9A\u0BC6\u0BAF\u0BCD\u0BA4\u0BC1 \u0B89\u0B9F\u0BA9\u0BC7 \u0BB5\u0BBE\u0BB0\u0BC1\u0B99\u0BCD\u0B95\u0BB3\u0BCD! \uD83D\uDE4F`},
+ml:{subtitle:"\u0D2E\u0D42\u0D24\u0D4D\u0D24 \u0D2A\u0D57\u0D30\u0D7B \u0D05\u0D1F\u0D3F\u0D2F\u0D28\u0D4D\u0D24\u0D30 \u0D2E\u0D41\u0D28\u0D4D\u0D28\u0D31\u0D3F\u0D2F\u0D3F\u0D2A\u0D4D\u0D2A\u0D4D",q1:"Start Voice",q2:"\u0D1F\u0D46\u0D38\u0D4D\u0D31\u0D4D\u0D31\u0D4D",q3:"\u0D15\u0D4D\u0D30\u0D2E\u0D40\u0D15\u0D30\u0D23\u0D02",nav1:"\u0D39\u0D4B\u0D02",nav2:"Minimize",nav3:"Instant",nav4:"\u0D15\u0D4B\u0D23\u0D4D\u0D1F\u0D3E\u0D15\u0D4D\u0D31\u0D4D\u0D31\u0D4D",nav5:"\u0D32\u0D4B\u0D17\u0D3F\u0D7B",settingsTitle:"\u2699 \u0D15\u0D4D\u0D30\u0D2E\u0D40\u0D15\u0D30\u0D23\u0D02",langTitle:"\u0D2D\u0D3E\u0D37",nameTitle:"\u0D28\u0D3F\u0D19\u0D4D\u0D19\u0D33\u0D41\u0D1F\u0D46 \u0D2A\u0D47\u0D30\u0D4D",nameLbl:"\u0D05\u0D32\u0D7C\u0D1F\u0D4D\u0D1F\u0D3F\u0D32\u0D4D \u0D2A\u0D47\u0D30\u0D4D",previewTitle:"\u0D2A\u0D4D\u0D30\u0D3F\u0D35\u0D4D\u0D2F\u0D4C",save:"\u0D38\u0D47\u0D35\u0D4D",dismiss:"\u2713 \u0D05\u0D1F",alertSent:"\u0D05\u0D32\u0D7C\u0D1F\u0D4D\u0D1F\u0D4D \u0D05\u0D2F\u0D1A\u0D4D\u0D1A\u0D41!",alertMsg:"\u0D38\u0D4D\u0D35\u0D2F\u0D02 \u0D05\u0D31\u0D3F\u0D2F\u0D3F\u0D15\u0D4D\u0D15\u0D41\u0D28\u0D4D\u0D28\u0D41...",voiceOff:"\u0D36\u0D2C\u0D4D\u0D26\u0D02 OFF",voiceOn:"\u0D36\u0D2C\u0D4D\u0D26\u0D02 ON",gpsReady:"GPS \u0D24\u0D2F\u0D4D\u0D2F\u0D3E\u0D31\u0D4D",gpsOff:"GPS \u0D07\u0D32\u0D4D\u0D32",saved:"\u2705 \u0D38\u0D47\u0D35\u0D4D!",noContacts:"\u0D15\u0D4B\u0D23\u0D4D\u0D1F\u0D3E\u0D15\u0D4D\u0D31\u0D4D\u0D31\u0D4D \u0D07\u0D32\u0D4D\u0D32!",testMode:"\uD83D\uDD14 \u0D1F\u0D46\u0D38\u0D4D\u0D31\u0D4D\u0D31\u0D4D",vpTitle:"\uD83C\uDFA4 \u0D36\u0D2C\u0D4D\u0D26\u0D02",vpTransTitle:"\uD83D\uDCE1 \u0D24\u0D7D\u0D38\u0D2E\u0D2F\u0D02",vpSetTitle:"\u2699 \u0D36\u0D2C\u0D4D\u0D26 \u0D15\u0D4D\u0D30\u0D2E\u0D40\u0D15\u0D30\u0D23\u0D02",vpLangLbl:"\u0D2D\u0D3E\u0D37",vpPhraseLbl:"\u0D06\u0D15\u0D4D\u0D1F\u0D3F\u0D35\u0D47\u0D37\u0D7B \u0D35\u0D3E\u0D15\u0D4D\u0D15\u0D4D",vpHint:"\u0D08 \u0D35\u0D3E\u0D15\u0D4D\u0D15\u0D4D \u0D2A\u0D31\u0D1E\u0D4D\u0D1E\u0D3E\u0D7D alert \u0D38\u0D4D\u0D35\u0D2F\u0D02 \u0D2A\u0D4B\u0D15\u0D41\u0D02",vpStart:"\uD83C\uDFA4 \u0D36\u0D2C\u0D4D\u0D26\u0D02 \u0D06\u0D30\u0D02\u0D2D\u0D3F\u0D15\u0D4D\u0D15\u0D41\u0D15",vpStop:"\u23F9 \u0D28\u0D3F\u0D7C\u0D24\u0D4D\u0D24\u0D41\u0D15",vpSave:"\u0D36\u0D2C\u0D4D\u0D26\u0D02 \u0D38\u0D47\u0D35\u0D4D",vpOff:"\u0D36\u0D2C\u0D4D\u0D26\u0D02 OFF",vpOn:"\u0D36\u0D2C\u0D4D\u0D26\u0D02 \u0D15\u0D47\u0D7E\u0D15\u0D4D\u0D15\u0D41\u0D28\u0D4D\u0D28\u0D41...",cpTitle:"\uD83D\uDCDE \u0D15\u0D4B\u0D23\u0D4D\u0D1F\u0D3E\u0D15\u0D4D\u0D31\u0D4D\u0D31\u0D4D",cpCard:"\u0D05\u0D1F\u0D3F\u0D2F\u0D28\u0D4D\u0D24\u0D30 \u0D15\u0D4B\u0D23\u0D4D\u0D1F\u0D3E\u0D15\u0D4D\u0D31\u0D4D\u0D31\u0D4D",cpAdd:"\u0D1A\u0D47\u0D7C\u0D15\u0D4D\u0D15\u0D41\u0D15",cpInfoTitle:"\u2139\uFE0F \u0D0E\u0D19\u0D4D\u0D19\u0D28\u0D46 \u0D2A\u0D4D\u0D30\u0D35\u0D7C\u0D24\u0D4D\u0D24\u0D3F\u0D15\u0D4D\u0D15\u0D41\u0D28\u0D4D\u0D28\u0D41",cpInfo:"\u0D1F\u0D4D\u0D30\u0D3F\u0D17\u0D4D\u0D17\u0D7C \u0D06\u0D15\u0D41\u0D2E\u0D4D\u0D2A\u0D4B\u0D7E:\n\uD83D\uDCDE 1\u0D3E\u0D2E\u0D24\u0D4D \u0D15\u0D4B\u0D23\u0D4D\u0D1F\u0D3E\u0D15\u0D4D\u0D31\u0D4D\u0D31\u0D4D\u0D15\u0D4D\u0D15\u0D4D \u0D38\u0D4D\u0D35\u0D2F\u0D02 Call\n\uD83D\uDCAC WhatsApp \u0D0E\u0D32\u0D4D\u0D32\u0D3E\u0D35\u0D7C\u0D15\u0D4D\u0D15\u0D41\u0D02\n\uD83D\uDCF1 SMS \u0D0E\u0D32\u0D4D\u0D32\u0D3E\u0D35\u0D7C\u0D15\u0D4D\u0D15\u0D41\u0D02\n\uD83D\uDCCD GPS \u0D38\u0D4D\u0D25\u0D32\u0D02\n\u26A1 \u0D38\u0D4D\u0D35\u0D2F\u0D02 \u0D28\u0D1F\u0D15\u0D4D\u0D15\u0D41\u0D02",cpSave:"\u0D38\u0D47\u0D35\u0D4D",bgRunning:"\u0D2A\u0D3F\u0D28\u0D4D\u0D28\u0D3F\u0D7D \u0D2A\u0D4D\u0D30\u0D35\u0D7C\u0D24\u0D4D\u0D24\u0D3F\u0D15\u0D4D\u0D15\u0D41\u0D28\u0D4D\u0D28\u0D41",langShort:"ML",langFlag:"\uD83C\uDDEE\uD83C\uDDF3",msg:(n,url,t)=>`\uD83D\uDEA8 \u0D05\u0D1F\u0D3F\u0D2F\u0D28\u0D4D\u0D24\u0D30 \u0D05\u0D32\u0D7C\u0D1F\u0D4D\u0D1F\u0D4D!\n${n}-\u0D28\u0D4D \u0D09\u0D1F\u0D28\u0D1F\u0D3F \u0D38\u0D39\u0D3E\u0D2F\u0D02 \u0D35\u0D47\u0D23\u0D02!\n\uD83D\uDCCD \u0D38\u0D4D\u0D25\u0D32\u0D02: ${url}\n\u23F0 ${t}\n\u0D09\u0D1F\u0D28\u0D1F\u0D3F \u0D35\u0D30\u0D42! \uD83D\uDE4F`},
+hi:{subtitle:"\u0935\u0930\u093F\u0937\u094D\u0920 \u0906\u092A\u093E\u0924\u0915\u093E\u0932\u0940\u0928 \u0905\u0932\u0930\u094D\u091F",q1:"Start Voice",q2:"\u091F\u0947\u0938\u094D\u091F",q3:"\u0938\u0947\u091F\u093F\u0902\u0917\u094D\u0938",nav1:"\u0939\u094B\u092E",nav2:"Minimize",nav3:"Instant",nav4:"\u0938\u0902\u092A\u0930\u094D\u0915",nav5:"\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932",settingsTitle:"\u2699 \u0938\u0947\u091F\u093F\u0902\u0917\u094D\u0938",langTitle:"\u092D\u093E\u0937\u093E",nameTitle:"\u0906\u092A\u0915\u093E \u0928\u093E\u092E",nameLbl:"\u0905\u0932\u0930\u094D\u091F \u092E\u0947\u0902 \u0928\u093E\u092E",previewTitle:"\u0905\u0932\u0930\u094D\u091F \u092A\u0942\u0930\u094D\u0935\u093E\u0935\u0932\u094B\u0915\u0928",save:"\u0938\u0947\u0935 \u0915\u0930\u0947\u0902",dismiss:"\u2713 \u092C\u0902\u0926",alertSent:"\u0905\u0932\u0930\u094D\u091F \u092D\u0947\u091C\u093E!",alertMsg:"\u0938\u094D\u0935\u091A\u093E\u0932\u093F\u0924 \u0905\u0932\u0930\u094D\u091F...",voiceOff:"\u0906\u0935\u093E\u091C\u093C \u092C\u0902\u0926",voiceOn:"\u0906\u0935\u093E\u091C\u093C \u091A\u093E\u0932\u0942",gpsReady:"GPS \u0924\u0948\u092F\u093E\u0930",gpsOff:"GPS \u092C\u0902\u0926",saved:"\u2705 \u0938\u0947\u0935!",noContacts:"\u0938\u0902\u092A\u0930\u094D\u0915 \u0928\u0939\u0940\u0902!",testMode:"\uD83D\uDD14 \u091F\u0947\u0938\u094D\u091F",vpTitle:"\uD83C\uDFA4 \u0906\u0935\u093E\u091C\u093C",vpTransTitle:"\uD83D\uDCE1 \u0932\u093E\u0907\u0935",vpSetTitle:"\u2699 \u0906\u0935\u093E\u091C\u093C \u0938\u0947\u091F\u093F\u0902\u0917",vpLangLbl:"\u092D\u093E\u0937\u093E",vpPhraseLbl:"\u0935\u093E\u0915\u094D\u092F\u093E\u0902\u0936",vpHint:"\u092C\u094B\u0932\u0928\u0947 \u092A\u0930 alert \u0905\u092A\u0928\u0947 \u0906\u092A \u091C\u093E\u090F\u0917\u093E",vpStart:"\uD83C\uDFA4 \u0906\u0935\u093E\u091C\u093C \u0936\u0941\u0930\u0942",vpStop:"\u23F9 \u0906\u0935\u093E\u091C\u093C \u092C\u0902\u0926",vpSave:"\u0906\u0935\u093E\u091C\u093C \u0938\u0947\u0935",vpOff:"\u0906\u0935\u093E\u091C\u093C OFF",vpOn:"\u0906\u0935\u093E\u091C\u093C \u0938\u0941\u0928 \u0930\u0939\u093E \u0939\u0948...",cpTitle:"\uD83D\uDCDE \u0938\u0902\u092A\u0930\u094D\u0915",cpCard:"\u0906\u092A\u093E\u0924\u0915\u093E\u0932\u0940\u0928 \u0938\u0902\u092A\u0930\u094D\u0915",cpAdd:"\u0938\u0902\u092A\u0930\u094D\u0915 \u091C\u094B\u0921\u093C\u0947\u0902",cpInfoTitle:"\u2139\uFE0F \u0905\u0932\u0930\u094D\u091F \u0915\u0948\u0938\u0947 \u0915\u093E\u092E \u0915\u0930\u0924\u093E \u0939\u0948",cpInfo:"\u091F\u094D\u0930\u093F\u0917\u0930 \u0939\u094B\u0928\u0947 \u092A\u0930:\n\uD83D\uDCDE 1\u0932\u0947 \u0938\u0902\u092A\u0930\u094D\u0915 \u0915\u094B \u0938\u094D\u0935\u0924: Call\n\uD83D\uDCAC WhatsApp \u0938\u092D\u0940 \u0915\u094B\n\uD83D\uDCF1 SMS \u0938\u092D\u0940 \u0915\u094B\n\uD83D\uDCCD GPS \u0938\u094D\u0925\u093E\u0928\n\u26A1 100% \u0938\u094D\u0935\u091A\u093E\u0932\u093F\u0924",cpSave:"\u0938\u0902\u092A\u0930\u094D\u0915 \u0938\u0947\u0935",bgRunning:"\u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F \u092E\u0947\u0902 \u091A\u0932 \u0930\u0939\u093E \u0939\u0948",langShort:"HI",langFlag:"\uD83C\uDDEE\uD83C\uDDF3",msg:(n,url,t)=>`\uD83D\uDEA8 \u0906\u092A\u093E\u0924\u0915\u093E\u0932\u0940\u0928 \u0905\u0932\u0930\u094D\u091F!\n${n} \u0915\u094B \u0924\u0924\u094D\u0915\u093E\u0932 \u092E\u0926\u0926 \u091A\u093E\u0939\u093F\u090F!\n\uD83D\uDCCD \u0938\u094D\u0925\u093E\u0928: ${url}\n\u23F0 ${t}\n\u0924\u0941\u0930\u0902\u0924 \u0906\u090F\u0902! \uD83D\uDE4F`},
+te:{subtitle:"\u0C38\u0C40\u0C28\u0C3F\u0C2F\u0C30\u0C4D \u0C05\u0C24\u0C4D\u0C2F\u0C35\u0C38\u0C30 \u0C39\u0C46\u0C1A\u0C4D\u0C1A\u0C30\u0C3F\u0C15",q1:"Start Voice",q2:"\u0C1F\u0C46\u0C38\u0C4D\u0C1F\u0C4D",q3:"\u0C38\u0C46\u0C1F\u0C4D\u0C1F\u0C3F\u0C02\u0C17\u0C4D\u0C38\u0C4D",nav1:"\u0C39\u0C4B\u0C2E\u0C4D",nav2:"Minimize",nav3:"Instant",nav4:"\u0C15\u0C3E\u0C02\u0C1F\u0C3E\u0C15\u0C4D\u0C1F\u0C4D\u0C38\u0C4D",nav5:"\u0C2A\u0C4D\u0C30\u0C4A\u0C2B\u0C48\u0C32\u0C4D",settingsTitle:"\u2699 \u0C38\u0C46\u0C1F\u0C4D\u0C1F\u0C3F\u0C02\u0C17\u0C4D\u0C38\u0C4D",langTitle:"\u0C2D\u0C3E\u0C37",nameTitle:"\u0C2E\u0C40 \u0C2A\u0C47\u0C30\u0C41",nameLbl:"\u0C39\u0C46\u0C1A\u0C4D\u0C1A\u0C30\u0C3F\u0C15\u0C32\u0C4B \u0C2A\u0C47\u0C30\u0C41",previewTitle:"\u0C2A\u0C4D\u0C30\u0C3F\u0C35\u0C4D\u0C2F\u0C42",save:"\u0C38\u0C47\u0C35\u0C4D",dismiss:"\u2713 \u0C2E\u0C42\u0C38\u0C3F",alertSent:"\u0C05\u0C32\u0C30\u0C4D\u0C1F\u0C4D \u0C2A\u0C02\u0C2A\u0C3F\u0C02\u0C26\u0C3F!",alertMsg:"\u0C38\u0C4D\u0C35\u0C2F\u0C02\u0C1A\u0C3E\u0C32\u0C15 \u0C05\u0C32\u0C30\u0C4D\u0C1F\u0C4D...",voiceOff:"\u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D OFF",voiceOn:"\u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D ON",gpsReady:"GPS \u0C38\u0C3F\u0C26\u0C4D\u0C27\u0C02",gpsOff:"GPS \u0C32\u0C47\u0C26\u0C41",saved:"\u2705 \u0C38\u0C47\u0C35\u0C4D!",noContacts:"\u0C15\u0C3E\u0C02\u0C1F\u0C3E\u0C15\u0C4D\u0C1F\u0C4D\u0C38\u0C4D \u0C32\u0C47\u0C35\u0C41!",testMode:"\uD83D\uDD14 \u0C1F\u0C46\u0C38\u0C4D\u0C1F\u0C4D",vpTitle:"\uD83C\uDFA4 \u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D",vpTransTitle:"\uD83D\uDCE1 \u0C32\u0C48\u0C35\u0C4D",vpSetTitle:"\u2699 \u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D \u0C38\u0C46\u0C1F\u0C4D\u0C1F\u0C3F\u0C02\u0C17\u0C4D\u0C38\u0C4D",vpLangLbl:"\u0C2D\u0C3E\u0C37",vpPhraseLbl:"\u0C2A\u0C26\u0C02",vpHint:"\u0C08 \u0C2A\u0C26\u0C02 \u0C1A\u0C46\u0C2C\u0C3F\u0C24\u0C47 alert \u0C35\u0C46\u0C33\u0C4D\u0C33\u0C41\u0C24\u0C41\u0C02\u0C26\u0C3F",vpStart:"\uD83C\uDFA4 \u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D \u0C38\u0C4D\u0C1F\u0C3E\u0C30\u0C4D\u0C1F\u0C4D",vpStop:"\u23F9 \u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D \u0C06\u0C2A\u0C41",vpSave:"\u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D \u0C38\u0C47\u0C35\u0C4D",vpOff:"\u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D OFF",vpOn:"\u0C35\u0C3E\u0C2F\u0C3F\u0C38\u0C4D \u0C35\u0C3F\u0C28\u0C4D\u0C28\u0C41\u0C28\u0C4D\u0C28\u0C26\u0C3F...",cpTitle:"\uD83D\uDCDE \u0C15\u0C3E\u0C02\u0C1F\u0C3E\u0C15\u0C4D\u0C1F\u0C4D\u0C38\u0C4D",cpCard:"\u0C05\u0C24\u0C4D\u0C2F\u0C35\u0C38\u0C30 \u0C15\u0C3E\u0C02\u0C1F\u0C3E\u0C15\u0C4D\u0C1F\u0C4D\u0C38\u0C4D",cpAdd:"\u0C1A\u0C47\u0C30\u0C4D\u0C1A\u0C41",cpInfoTitle:"\u2139\uFE0F \u0C0E\u0C32\u0C3E \u0C2A\u0C28\u0C3F \u0C1A\u0C47\u0C38\u0C4D\u0C24\u0C41\u0C02\u0C26\u0C3F",cpInfo:"\u0C1F\u0C4D\u0C30\u0C3F\u0C17\u0C4D\u0C17\u0C30\u0C4D \u0C05\u0C2F\u0C3F\u0C28\u0C2A\u0C4D\u0C2A\u0C41\u0C21\u0C41:\n\uD83D\uDCDE 1\u0C35 \u0C15\u0C3E\u0C02\u0C1F\u0C3E\u0C15\u0C4D\u0C1F\u0C4D\u0C15\u0C41 \u0C38\u0C4D\u0C35\u0C2F\u0C02 Call\n\uD83D\uDCAC WhatsApp \u0C05\u0C02\u0C26\u0C30\u0C3F\u0C15\u0C40\n\uD83D\uDCF1 SMS \u0C05\u0C02\u0C26\u0C30\u0C3F\u0C15\u0C40\n\uD83D\uDCCD GPS \u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02\n\u26A1 \u0C38\u0C4D\u0C35\u0C2F\u0C02\u0C1A\u0C3E\u0C32\u0C15\u0C02",cpSave:"\u0C38\u0C47\u0C35\u0C4D",bgRunning:"\u0C2A\u0C4D\u0C30\u0C3E\u0C30\u0C02\u0C2D\u0C02\u0C32\u0C4B \u0C28\u0C21\u0C41\u0C38\u0C4D\u0C24\u0C41\u0C28\u0C4D\u0C28\u0C26\u0C3F",langShort:"TE",langFlag:"\uD83C\uDDEE\uD83C\uDDF3",msg:(n,url,t)=>`\uD83D\uDEA8 \u0C05\u0C24\u0C4D\u0C2F\u0C35\u0C38\u0C30 \u0C39\u0C46\u0C1A\u0C4D\u0C1A\u0C30\u0C3F\u0C15!\n${n}\u0C15\u0C3F \u0C38\u0C39\u0C3E\u0C2F\u0C02 \u0C15\u0C3E\u0C35\u0C3E\u0C32\u0C3F!\n\uD83D\uDCCD \u0C38\u0C4D\u0C25\u0C3E\u0C28\u0C02: ${url}\n\u23F0 ${t}\n\u0C35\u0C46\u0C02\u0C1F\u0C28\u0C47 \u0C30\u0C02\u0C21\u0C3F! \uD83D\uDE4F`},
+kn:{subtitle:"\u0CB9\u0CBF\u0CB0\u0CBF\u0CAF \u0CA4\u0CC1\u0CB0\u0CCD\u0CA4\u0CC1 \u0C8E\u0C9A\u0CCD\u0C9A\u0CB0\u0CBF\u0C95\u0CC6",q1:"Start Voice",q2:"\u0CAA\u0CB0\u0CC0\u0C95\u0CCD\u0CB7\u0CC6",q3:"\u0CB8\u0CC6\u0C9F\u0CCD\u0C9F\u0CBF\u0C82\u0C97\u0CCD\u0CB8\u0CCD",nav1:"\u0CAE\u0CA8\u0CC6",nav2:"Minimize",nav3:"Instant",nav4:"\u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95",nav5:"\u0CAA\u0CCD\u0CB0\u0CCA\u0CAB\u0CC8\u0CB2\u0CCD",settingsTitle:"\u2699 \u0CB8\u0CC6\u0C9F\u0CCD\u0C9F\u0CBF\u0C82\u0C97\u0CCD\u0CB8\u0CCD",langTitle:"\u0CAD\u0CBE\u0CB7\u0CC6",nameTitle:"\u0CA8\u0CBF\u0CAE\u0CCD\u0CAE \u0CB9\u0CC6\u0CB8\u0CB0\u0CC1",nameLbl:"\u0C8E\u0C9A\u0CCD\u0C9A\u0CB0\u0CBF\u0C95\u0CC6\u0CAF\u0CB2\u0CCD\u0CB2\u0CBF \u0CB9\u0CC6\u0CB8\u0CB0\u0CC1",previewTitle:"\u0CAA\u0CCD\u0CB0\u0CBF\u0CB5\u0CCD\u0CAF\u0CC2",save:"\u0C89\u0CB3\u0CBF\u0CB8\u0CBF",dismiss:"\u2713 \u0CAE\u0CC1\u0C9A\u0CCD\u0C9A\u0CBF",alertSent:"\u0C8E\u0C9A\u0CCD\u0C9A\u0CB0\u0CBF\u0C95\u0CC6 \u0C95\u0CB3\u0CC1\u0CB9\u0CBF\u0CB8\u0CB2\u0CBE\u0C97\u0CBF\u0CA6\u0CC6!",alertMsg:"\u0CB8\u0CCD\u0CB5\u0CAF\u0C82 \u0C85\u0CB2\u0CCD\u0CB0\u0CCD\u0C9F\u0CCD...",voiceOff:"\u0CA7\u0CCD\u0CB5\u0CA8\u0CBF OFF",voiceOn:"\u0CA7\u0CCD\u0CB5\u0CA8\u0CBF ON",gpsReady:"GPS \u0CB8\u0CBF\u0CA6\u0CCD\u0CA7",gpsOff:"GPS \u0C87\u0CB2\u0CCD\u0CB2",saved:"\u2705 \u0C89\u0CB3\u0CBF\u0CB8\u0CB2\u0CBE\u0C97\u0CBF\u0CA6\u0CC6!",noContacts:"\u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95 \u0C87\u0CB2\u0CCD\u0CB2!",testMode:"\uD83D\uDD14 \u0CAA\u0CB0\u0CC0\u0C95\u0CCD\u0CB7\u0CC6",vpTitle:"\uD83C\uDFA4 \u0CA7\u0CCD\u0CB5\u0CA8\u0CBF",vpTransTitle:"\uD83D\uDCE1 \u0CB2\u0CC8\u0CB5\u0CCD",vpSetTitle:"\u2699 \u0CA7\u0CCD\u0CB5\u0CA8\u0CBF \u0CB8\u0CC6\u0C9F\u0CCD\u0C9F\u0CBF\u0C82\u0C97\u0CCD",vpLangLbl:"\u0CAD\u0CBE\u0CB7\u0CC6",vpPhraseLbl:"\u0CAA\u0CA6",vpHint:"\u0C88 \u0CAA\u0CA6 \u0CB9\u0CC7\u0CB3\u0CBF\u0CA6\u0CB0\u0CC6 alert \u0CB9\u0CCB\u0C97\u0CC1\u0CA4\u0CCD\u0CA4\u0CA6\u0CC6",vpStart:"\uD83C\uDFA4 \u0CA7\u0CCD\u0CB5\u0CA8\u0CBF \u0CAA\u0CCD\u0CB0\u0CBE\u0CB0\u0C82\u0CAD\u0CBF\u0CB8\u0CBF",vpStop:"\u23F9 \u0CA7\u0CCD\u0CB5\u0CA8\u0CBF \u0CA8\u0CBF\u0CB2\u0CCD\u0CB2\u0CBF\u0CB8\u0CBF",vpSave:"\u0CA7\u0CCD\u0CB5\u0CA8\u0CBF \u0C89\u0CB3\u0CBF\u0CB8\u0CBF",vpOff:"\u0CA7\u0CCD\u0CB5\u0CA8\u0CBF OFF",vpOn:"\u0CA7\u0CCD\u0CB5\u0CA8\u0CBF \u0C95\u0CC7\u0CB3\u0CC1\u0CA4\u0CCD\u0CA4\u0CBF\u0CA6\u0CC6...",cpTitle:"\uD83D\uDCDE \u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95",cpCard:"\u0CA4\u0CC1\u0CB0\u0CCD\u0CA4\u0CC1 \u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95",cpAdd:"\u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95 \u0CB8\u0CC7\u0CB0\u0CBF\u0CB8\u0CBF",cpInfoTitle:"\u2139\uFE0F \u0C8E\u0C9A\u0CCD\u0C9A\u0CB0\u0CBF\u0C95\u0CC6 \u0CB9\u0CC7\u0C97\u0CC6 \u0C95\u0CC6\u0CB2\u0CB8 \u0CAE\u0CBE\u0CA1\u0CC1\u0CA4\u0CCD\u0CA4\u0CA6\u0CC6",cpInfo:"\u0C9F\u0CCD\u0CB0\u0CBF\u0C97\u0CB0\u0CCD \u0C86\u0CA6\u0CBE\u0C97:\n\uD83D\uDCDE 1\u0CA8\u0CC7 \u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95\u0C95\u0CCD\u0C95\u0CC6 \u0CB8\u0CCD\u0CB5\u0CAF\u0C82 Call\n\uD83D\uDCAC WhatsApp \u0C8E\u0CB2\u0CCD\u0CB2\u0CB0\u0CBF\u0C97\u0CC2\n\uD83D\uDCF1 SMS \u0C8E\u0CB2\u0CCD\u0CB2\u0CB0\u0CBF\u0C97\u0CC2\n\uD83D\uDCCD GPS \u0CB8\u0CCD\u0CA5\u0CB3\n\u26A1 \u0CB8\u0CCD\u0CB5\u0CAF\u0C82\u0C9A\u0CBE\u0CB2\u0C95",cpSave:"\u0CB8\u0C82\u0CAA\u0CB0\u0CCD\u0C95 \u0C89\u0CB3\u0CBF\u0CB8\u0CBF",bgRunning:"\u0CB9\u0CBF\u0CA8\u0CCD\u0CA8\u0CC6\u0CB2\u0CC6\u0CAF\u0CB2\u0CCD\u0CB2\u0CBF \u0C9A\u0CBE\u0CB2\u0CC1",langShort:"KN",langFlag:"\uD83C\uDDEE\uD83C\uDDF3",msg:(n,url,t)=>`\uD83D\uDEA8 \u0CA4\u0CC1\u0CB0\u0CCD\u0CA4\u0CC1 \u0C8E\u0C9A\u0CCD\u0C9A\u0CB0\u0CBF\u0C95\u0CC6!\n${n}\u0C97\u0CC6 \u0CB8\u0CB9\u0CBE\u0CAF \u0CAC\u0CC7\u0C95\u0CC1!\n\uD83D\uDCCD \u0CB8\u0CCD\u0CA5\u0CB3: ${url}\n\u23F0 ${t}\n\u0CA6\u0CAF\u0CB5\u0CBF\u0C9F\u0CCD\u0C9F\u0CC1 \u0CA4\u0C95\u0CCB\u0CB3 \u0CAC\u0CA8\u0CCD\u0CA8\u0CBF! \uD83D\uDE4F`}
+};
+
+/* STATE */
+let S={userName:'',voiceLang:'en-IN',voiceWord:'help me',contacts:[],appLang:'en'};
+const LS={
+  g:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},
+  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+function loadS(){const d=LS.g('htz8');if(d)S={...S,...d};}
+function saveS(){LS.s('htz8',S);}
+
+/* APPLY LANGUAGE */
+function applyLang(code,persist){
+  S.appLang=code;
+  if(persist)saveS();
+  const L=LANG[code]||LANG.en;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  s('ui-subtitle',L.subtitle);s('ui-q1',L.q1);s('ui-q2',L.q2);s('ui-q3',L.q3);
+  s('ui-nav1',L.nav1);s('ui-nav2',L.nav2);s('ui-nav3',L.nav3);s('ui-nav4',L.nav4);s('ui-nav5',L.nav5);
+  s('ui-settings-title',L.settingsTitle);s('ui-lang-title',L.langTitle);
+  s('ui-name-title',L.nameTitle);s('ui-name-lbl',L.nameLbl);
+  s('ui-preview-title',L.previewTitle);s('ui-save',L.save);s('ui-dismiss',L.dismiss);
+  s('aov-title',L.alertSent);
+  s('ui-vp-title',L.vpTitle);s('ui-vp-transcript-title',L.vpTransTitle);
+  s('ui-vp-settings-title',L.vpSetTitle);s('ui-vp-lang-lbl',L.vpLangLbl);
+  s('ui-vp-phrase-lbl',L.vpPhraseLbl);s('ui-vp-hint',L.vpHint);s('ui-vp-save',L.vpSave);
+  s('ui-cp-title',L.cpTitle);s('ui-cp-card-title',L.cpCard);s('ui-cp-add',L.cpAdd);
+  s('ui-cp-info-title',L.cpInfoTitle);s('ui-cp-info',L.cpInfo);s('ui-cp-save',L.cpSave);
+  s('bgBadgeTxt',L.bgRunning);
+  // Update lang dropdown button
+  const fl=document.getElementById('langFlag');const ln=document.getElementById('langName');
+  if(fl)fl.textContent=L.langFlag;if(ln)ln.textContent=L.langShort;
+  // Mark active in dropdown
+  document.querySelectorAll('.lang-opt').forEach(o=>{
+    o.classList.toggle('active',o.getAttribute('onclick').includes("'"+code+"'"));
+  });
+  const al=document.getElementById('appLang');if(al)al.value=code;
+  updateMicUI();
+  const gL=LANG[S.appLang]||LANG.en;
+  if(gpsCoords)setTxt('locTxt',gL.gpsReady);else setTxt('locTxt',gL.gpsOff);
+}
+
+/* LANGUAGE DROPDOWN */
+function toggleLangDrop(){
+  const d=document.getElementById('langDrop');
+  const b=document.getElementById('langDropBtn');
+  const open=d.classList.toggle('open');
+  b.classList.toggle('open',open);
+}
+function selectLangDrop(code){
+  const d=document.getElementById('langDrop');
+  const b=document.getElementById('langDropBtn');
+  d.classList.remove('open');b.classList.remove('open');
+  applyLang(code,true);
+}
+// Close dropdown on outside click
+document.addEventListener('click',e=>{
+  const wrap=document.querySelector('.lang-dropdown-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    document.getElementById('langDrop').classList.remove('open');
+    document.getElementById('langDropBtn').classList.remove('open');
+  }
+});
+
+/* SCREENS */
+function selectLang(code){S.appLang=code;saveS();applyLang(code,false);showScreen('home');}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='home')updateBadge();
+  if(id==='settings')renderSettings();
+  if(id==='voicepage')renderVoicePage();
+  if(id==='contactpage')renderContactPage();
+}
+
+/* SETTINGS */
+function renderSettings(){
+  document.getElementById('uName').value=S.userName;
+  const al=document.getElementById('appLang');if(al)al.value=S.appLang;
+  const pn=document.getElementById('pName');if(pn)pn.textContent=S.userName||'Your Name';
+}
+function saveSettings(){
+  S.userName=document.getElementById('uName').value.trim();
+  S.appLang=document.getElementById('appLang').value;
+  saveS();applyLang(S.appLang,false);
+  showToast((LANG[S.appLang]||LANG.en).saved);
+  setTimeout(()=>showScreen('home'),700);
+}
+function updateBadge(){document.getElementById('cBadge').textContent=S.contacts.filter(c=>c.phone).length;}
+
+/* VOICE PAGE */
+function renderVoicePage(){
+  const L=LANG[S.appLang]||LANG.en;
+  document.getElementById('vpLang').value=S.voiceLang;
+  document.getElementById('vpWord').value=S.voiceWord;
+  document.getElementById('vp-phrase-show').textContent='"'+S.voiceWord+'"';
+  document.getElementById('vp-stat').textContent=voiceOn?L.vpOn:L.vpOff;
+  const tb=document.getElementById('vpToggleBtn');
+  tb.textContent=voiceOn?L.vpStop:L.vpStart;
+  tb.className='toggle-btn '+(voiceOn?'on':'off');
+  document.getElementById('vpOrb').className='vp-orb'+(voiceOn?' on':'');
+}
+function saveVoiceSettings(){
+  S.voiceLang=document.getElementById('vpLang').value;
+  S.voiceWord=document.getElementById('vpWord').value.trim()||'help me';
+  saveS();
+  document.getElementById('vp-phrase-show').textContent='"'+S.voiceWord+'"';
+  if(voiceOn){stopVoice();startVoice();}
+  showToast((LANG[S.appLang]||LANG.en).saved);
+}
+function toggleVoice(){voiceOn?stopVoice():startVoice();}
+
+/* CONTACTS PAGE */
+function renderContactPage(){
+  const L=LANG[S.appLang]||LANG.en;
+  const list=document.getElementById('cpList');list.innerHTML='';
+  S.contacts.forEach((c,i)=>{
+    const row=document.createElement('div');row.className='crow';
+    row.innerHTML=`<input class="finp" type="text" placeholder="${L.nameTitle}" value="${esc(c.name)}" data-i="${i}" data-f="name"/>
+      <input class="finp" type="tel" placeholder="+91XXXXXXXXXX" value="${esc(c.phone)}" data-i="${i}" data-f="phone"/>
+      <button class="cdel" data-i="${i}">\u2715</button>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{
+    S.contacts[+e.target.dataset.i][e.target.dataset.f]=e.target.value;
+  }));
+  list.querySelectorAll('.cdel').forEach(b=>b.addEventListener('click',()=>{
+    S.contacts.splice(+b.dataset.i,1);renderContactPage();
+  }));
+  document.getElementById('cpAddBtn').style.display=S.contacts.length>=7?'none':'';
+}
+function addContact(){
+  if(S.contacts.length>=7)return;
+  S.contacts.push({name:'',phone:''});renderContactPage();
+}
+function saveContacts(){
+  saveS();updateBadge();
+  showToast((LANG[S.appLang]||LANG.en).saved);
+  setTimeout(()=>showScreen('home'),700);
+}
+
+/* MIC BUTTON -> voice page */
+document.getElementById('micBtn').addEventListener('click',()=>showScreen('voicepage'));
+
+/* GPS */
+let gpsCoords=null;
+function startGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.watchPosition(
+    p=>{gpsCoords=p.coords;setDot('locDot','g');const L=LANG[S.appLang]||LANG.en;setTxt('locTxt',L.gpsReady);setPill('locPill',true);},
+    ()=>{const L=LANG[S.appLang]||LANG.en;setDot('locDot','');setTxt('locTxt',L.gpsOff);setPill('locPill',false);},
+    {enableHighAccuracy:true,maximumAge:15000}
+  );
+}
+function getGPS(){
+  return new Promise(res=>{
+    if(gpsCoords){res(gpsCoords);return;}
+    navigator.geolocation?.getCurrentPosition(p=>res(p.coords),()=>res(null),{timeout:8000,enableHighAccuracy:true});
+  });
+}
+function mapsUrl(c){return c?`https://maps.google.com/?q=${c.latitude},${c.longitude}`:'(GPS unavailable)';}
+
+/* VOICE — FULLY AUTO ALERT */
+let recognition=null,voiceOn=false;
+function buildRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  const r=new SR();
+  r.continuous=true;r.interimResults=true;r.lang=S.voiceLang;
+  r.onresult=e=>{
+    let txt='';
+    for(let i=e.resultIndex;i<e.results.length;i++)txt+=e.results[i][0].transcript;
+    const tp=document.getElementById('vpTranscript');if(tp)tp.textContent=txt||'--';
+    if(txt.toLowerCase().includes(S.voiceWord.toLowerCase()))triggerAlert('voice');
+  };
+  r.onerror=e=>{
+    if(e.error==='not-allowed'){showToast('Mic permission denied');voiceOn=false;updateMicUI();}
+    else if(e.error!=='aborted'){setTimeout(()=>{if(voiceOn)try{r.start();}catch(ex){}},1000);}
+  };
+  r.onend=()=>{if(voiceOn)setTimeout(()=>{try{recognition?.start();}catch(ex){}},500);};
+  return r;
+}
+function startVoice(){
+  recognition=buildRec();
+  if(!recognition){showToast('Voice not supported');return;}
+  recognition.lang=S.voiceLang;
+  try{recognition.start();}catch(e){}
+  voiceOn=true;LS.s('htz_voice','1');
+  updateMicUI();
+  if(document.getElementById('voicepage').classList.contains('active'))renderVoicePage();
+  showBgBadge(true);
+}
+function stopVoice(){
+  voiceOn=false;try{recognition?.stop();}catch(e){}
+  LS.s('htz_voice','0');updateMicUI();
+  if(document.getElementById('voicepage').classList.contains('active'))renderVoicePage();
+  showBgBadge(false);
+}
+function updateMicUI(){
+  const L=LANG[S.appLang]||LANG.en;
+  const ico=document.getElementById('micSvgIcon');
+  const bdg=document.getElementById('micBdg');
+  const btn=document.getElementById('micBtn');
+  if(voiceOn){
+    if(ico)ico.innerHTML='<circle cx="24" cy="24" r="18" fill="rgba(255,255,255,0.12)"/><circle cx="24" cy="24" r="10" fill="white" opacity="0.88"/><circle cx="24" cy="24" r="6" fill="#ff2035"/>';
+    if(bdg)bdg.style.display='flex';
+    if(btn)btn.classList.add('voice-active');
+    setDot('micDot','r');setTxt('micTxt','"'+S.voiceWord+'"');setPill('micPill',true);
+  } else {
+    if(ico)ico.innerHTML='<rect x="17" y="4" width="14" height="22" rx="7" fill="white" opacity="0.95"/><path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/><line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="17" y1="44" x2="31" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>';
+    if(bdg)bdg.style.display='none';
+    if(btn)btn.classList.remove('voice-active');
+    setDot('micDot','');setTxt('micTxt',L.voiceOff);setPill('micPill',false);
+  }
+}
+
+/* BACKGROUND RUNNING */
+function showBgBadge(on){
+  const b=document.getElementById('bgBadge');
+  if(b)b.classList.toggle('show',on);
+}
+// Keep voice alive when page hidden (minimize/back)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'&&voiceOn){
+    // Voice recognition may stop when hidden — restart
+    setTimeout(()=>{
+      if(voiceOn&&recognition){
+        try{recognition.start();}catch(e){}
+      }
+    },800);
+  }
+});
+// Prevent back button from closing app — only minimize
+window.addEventListener('popstate',e=>{
+  // Push state again so back doesn't exit
+  history.pushState(null,'',location.href);
+  // Go to home screen if on inner page
+  const active=document.querySelector('.screen.active');
+  if(active&&active.id!=='home'&&active.id!=='langselect'){
+    showScreen('home');
+  }
+  // else minimize app (we can't truly prevent this on all devices)
+});
+// Push initial state to intercept back
+history.pushState(null,'',location.href);
+
+/* ALERT — 100% AUTOMATIC */
+let alertBusy=false;
+async function triggerAlert(src='button'){
+  if(alertBusy)return;
+  alertBusy=true;
+  const L=LANG[S.appLang]||LANG.en;
+  if(navigator.vibrate)navigator.vibrate([300,100,300,100,600]);
+  const aov=document.getElementById('aov');
+  aov.classList.add('show');
+  setTxt('aov-title',L.alertSent);
+  setTxt('ui-dismiss',L.dismiss);
+  setTxt('aovMsg',src==='voice'?'"'+S.voiceWord+'" '+L.voiceOn+'!':L.alertMsg);
+  document.getElementById('aovSteps').innerHTML='';
+
+  const coords=await getGPS();
+  const mapUrl=mapsUrl(coords);
+  const name=S.userName||'Someone';
+  const time=new Date().toLocaleString();
+  const msg=L.msg(name,mapUrl,time);
+  const enc=encodeURIComponent(msg);
+  const isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+  const contacts=S.contacts.filter(c=>c.phone.trim());
+
+  if(!contacts.length){addStep('\u26A0\uFE0F',L.noContacts,false);return;}
+
+  // STEP 1: AUTO-CALL first contact immediately
+  const firstPhone=contacts[0].phone;
+  const callA=document.createElement('a');
+  callA.href='tel:'+firstPhone;callA.style.display='none';
+  document.body.appendChild(callA);callA.click();
+  setTimeout(()=>document.body.removeChild(callA),200);
+  addStep('\uD83D\uDCDE','Auto-calling: '+(contacts[0].name||firstPhone),false);
+
+  // STEP 2: Auto-open WhatsApp for first contact
+  setTimeout(()=>{
+    window.open('https://wa.me/'+fmtPhone(contacts[0].phone)+'?text='+enc,'_blank');
+  },1500);
+
+  // Show all contact steps
+  contacts.forEach((c,i)=>{
+    const ph=fmtPhone(c.phone);const lbl=c.name||'Contact '+(i+1);
+    const isMobDev=/Android|iPhone|iPad/i.test(navigator.userAgent);
+    addStep('\uD83D\uDCDE','Call \u2192 '+lbl,true,'tel:'+c.phone);
+    addStep('\uD83D\uDCAC','WhatsApp \u2192 '+lbl,true,'https://wa.me/'+ph+'?text='+enc);
+    addStep('\uD83D\uDCF1','SMS \u2192 '+lbl,true,'sms:'+c.phone+(isMobDev?'?&':'?')+'body='+enc);
+  });
+
+  addStep(coords?'\uD83D\uDCCD':'\u26A0\uFE0F',
+    coords?'GPS: '+coords.latitude.toFixed(5)+', '+coords.longitude.toFixed(5):'GPS unavailable',false);
+  setTxt('aovMsg','Auto-called 1st contact. Tap others to send.');
+}
+function addStep(ico,txt,isLink,href){
+  const steps=document.getElementById('aovSteps');
+  const el=document.createElement(isLink?'a':'div');
+  el.className='aov-step';
+  el.innerHTML='<span>'+ico+'</span><span>'+txt+'</span>';
+  if(isLink){el.href=href;el.target='_blank';el.addEventListener('click',()=>el.classList.add('done'));}
+  steps.appendChild(el);
+}
+function dismissAlert(){document.getElementById('aov').classList.remove('show');alertBusy=false;}
+
+/* TEST */
+document.getElementById('testBtn').addEventListener('click',()=>{
+  const L=LANG[S.appLang]||LANG.en;
+  document.getElementById('aov').classList.add('show');
+  setTxt('aov-title',L.alertSent);
+  setTxt('aovMsg',L.testMode);
+  document.getElementById('aovSteps').innerHTML='';
+  addStep('\u2705',S.contacts.filter(c=>c.phone).length+' contact(s) ready',false);
+  addStep(gpsCoords?'\uD83D\uDCCD':'\u26A0\uFE0F',gpsCoords?'GPS ready':'GPS not ready',false);
+  addStep('\uD83C\uDFA4',voiceOn?'Voice ON: "'+S.voiceWord+'"':'Voice OFF',false);
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  alertBusy=false;
+});
+
+/* SPHERE */
+document.getElementById('mainBtn').addEventListener('click',()=>triggerAlert('button'));
+
+/* HELPERS */
+function setDot(id,c){const d=document.getElementById(id);if(d)d.className='sdot'+(c?' '+c:'');}
+function setTxt(id,t){const e=document.getElementById(id);if(e)e.textContent=t;}
+function setPill(id,on){const e=document.getElementById(id);if(e)e.classList.toggle('on',on);}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtPhone(p){let n=p.replace(/\D/g,'');if(n.startsWith('0'))n=n.slice(1);if(!n.startsWith('91')&&n.length===10)n='91'+n;return n;}
+let tT;
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),3200);}
+
+
+/* MINIMIZE APP */
+function minimizeApp() {
+  // On mobile: blur the window (sends to background on some browsers)
+  if (navigator.vibrate) navigator.vibrate(100);
+  showToast((LANG[S.appLang]||LANG.en).bgRunning || "Running in background...");
+  // Show bg badge
+  showBgBadge(true);
+  // Try to blur/minimize
+  window.blur();
+  // On Android Chrome, this helps
+  if (/Android/i.test(navigator.userAgent)) {
+    setTimeout(() => { window.focus(); window.blur(); }, 100);
+  }
+}
+
+/* INIT */
+loadS();
+const firstLaunch=!LS.g('htz8');
+if(firstLaunch){showScreen('langselect');}
+else{applyLang(S.appLang,false);showScreen('home');}
+startGPS();updateMicUI();updateBadge();
+if(LS.g('htz_voice')==='1')startVoice();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
