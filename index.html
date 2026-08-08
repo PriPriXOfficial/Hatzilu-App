@@ -1,0 +1,2671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#04091a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Hatzilu"/>
+<title>Hatzilu</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#04091a;--red:#e8001c;--red2:#ff2035;--red3:#ff5566;
+  --gold:#f5c518;--white:#fff;--silver:#9cb0cc;--muted:#3d526e;
+  --success:#22d46a;--nav:rgba(4,8,20,.97);--card:rgba(255,255,255,.042);
+  --border:rgba(255,255,255,.075);--borderhi:rgba(255,255,255,.16);
+  --fd:'Bebas Neue',sans-serif;--fb:'Inter',sans-serif;
+  --spring:cubic-bezier(.34,1.56,.64,1);--eout:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--white);font-family:var(--fb);
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font-family:var(--fb);cursor:pointer;outline:none}
+.screen{display:none;flex-direction:column;height:100vh;height:100dvh}
+.screen.active{display:flex}
+
+/* HOME BG */
+#home{position:relative;overflow:hidden;
+  background:radial-gradient(ellipse 75% 42% at 50% 60%,rgba(220,0,20,.30) 0%,rgba(180,0,15,.12) 42%,transparent 68%),
+    radial-gradient(ellipse 110% 32% at 50% 102%,rgba(180,0,15,.24) 0%,transparent 58%),
+    linear-gradient(180deg,#08102a 0%,#05091c 38%,#060b1f 100%)}
+#home::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.013) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.013) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%)}
+
+/* TOP BAR */
+.topbar{position:relative;z-index:10;display:flex;align-items:center;
+  justify-content:space-between;padding:clamp(14px,4vw,22px) clamp(16px,5vw,26px) 0}
+.lang-dropdown-wrap{position:relative}
+.lang-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(255,255,255,.14);border-radius:12px;padding:8px 12px;
+  color:var(--silver);font-size:13px;font-weight:700;transition:all .2s var(--spring)}
+.lang-btn:hover{background:rgba(255,255,255,.12);border-color:var(--gold);color:var(--gold)}
+.lang-btn .arrow{font-size:10px;opacity:.7;transition:transform .2s}
+.lang-btn.open .arrow{transform:rotate(180deg)}
+.lang-tiny-icon{font-size:14px;line-height:1;flex-shrink:0}
+.lo-code{display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:20px;border-radius:5px;background:rgba(245,197,24,.18);
+  border:1px solid rgba(245,197,24,.35);color:var(--gold);
+  font-size:10px;font-weight:900;letter-spacing:.5px;flex-shrink:0}
+.lang-opt:hover .lo-code{background:rgba(245,197,24,.30);border-color:var(--gold)}
+.lang-opt.active .lo-code{background:rgba(245,197,24,.35);border-color:var(--gold);color:#000}
+.lo-name{flex:1;font-size:13px}
+.ls-code{display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:22px;border-radius:7px;background:rgba(245,197,24,.18);
+  border:1.5px solid rgba(245,197,24,.4);color:var(--gold);
+  font-size:11px;font-weight:900;letter-spacing:.5px;margin-bottom:2px}
+.lang-dropdown{position:absolute;top:calc(100% + 8px);left:0;
+  background:#0d1b38;border:1.5px solid rgba(255,255,255,.14);border-radius:14px;
+  overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.6);display:none;z-index:100;min-width:170px}
+.lang-dropdown.open{display:block}
+.lang-opt{display:flex;align-items:center;gap:10px;padding:12px 16px;
+  font-size:13px;font-weight:700;color:var(--silver);border:none;background:none;
+  width:100%;text-align:left;transition:background .15s}
+.lang-opt:hover{background:rgba(255,255,255,.08);color:var(--white)}
+.lang-opt.active{background:rgba(245,197,24,.10);color:var(--gold)}
+
+.t-menu{position:relative;width:50px;height:50px;
+  background:linear-gradient(145deg,#ff1f35,#c40018,#8c000f);
+  border:none;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4.5px;
+  box-shadow:0 4px 18px rgba(232,0,28,.60),inset 0 1px 0 rgba(255,150,160,.28);
+  transition:all .22s var(--spring)}
+.t-menu span{display:block;width:18px;height:2.5px;background:rgba(255,255,255,.92);border-radius:2px}
+.t-menu:hover{transform:scale(1.08) translateY(-1px);box-shadow:0 8px 28px rgba(232,0,28,.80)}
+.t-menu:active{transform:scale(.95)}
+.t-badge{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:10px;
+  background:linear-gradient(135deg,#ff8800,#e06000);border:2px solid var(--bg);
+  font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 4px}
+
+/* TITLE */
+.title-block{position:relative;z-index:5;text-align:center;padding:clamp(2px,1vw,6px) 0 0}
+.title-h1{font-family:var(--fd);font-size:clamp(56px,16vw,96px);letter-spacing:6px;
+  color:#fff;line-height:.92;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(200,220,255,.4),
+    0 3px 6px rgba(0,0,20,.7),0 6px 20px rgba(0,0,0,.5)}
+.title-sub{font-size:clamp(10px,2.5vw,13px);letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-top:4px;text-shadow:0 0 16px rgba(245,197,24,.35)}
+
+/* STATUS */
+.status-row{position:relative;z-index:5;display:flex;justify-content:center;gap:9px;
+  padding:clamp(4px,1.2vw,9px) 16px 0}
+.sp{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.038);
+  border:1px solid rgba(255,255,255,.065);border-radius:100px;padding:5px 12px;
+  font-size:10.5px;font-weight:700;color:var(--muted);transition:all .35s}
+.sp.on{color:var(--silver);border-color:rgba(255,255,255,.12)}
+.sdot{width:6px;height:6px;border-radius:50%;background:#1a2840;flex-shrink:0;transition:all .35s}
+.sdot.g{background:var(--success);box-shadow:0 0 7px var(--success)}
+.sdot.r{background:var(--red2);box-shadow:0 0 7px var(--red2);animation:blink 1.1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* SPHERE */
+.sphere-stage{position:relative;z-index:5;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.ring{position:absolute;border-radius:50%;border:1px solid;pointer-events:none;animation:ring-out 3.2s ease-out infinite}
+.ring:nth-child(1){width:min(75vw,330px);height:min(75vw,330px);border-color:rgba(232,0,28,.42)}
+.ring:nth-child(2){width:min(90vw,394px);height:min(90vw,394px);border-color:rgba(232,0,28,.20);animation-delay:1.06s}
+.ring:nth-child(3){width:min(105vw,460px);height:min(105vw,460px);border-color:rgba(232,0,28,.09);animation-delay:2.12s}
+@keyframes ring-out{0%{opacity:.9;transform:scale(.88)}100%{opacity:0;transform:scale(1.20)}}
+.orbit-dash{position:absolute;width:min(80vw,354px);height:min(80vw,354px);
+  border-radius:50%;border:1.5px dashed rgba(232,0,28,.20);pointer-events:none;animation:spin-cw 14s linear infinite}
+.orbit-dash2{position:absolute;width:min(86vw,378px);height:min(86vw,378px);
+  border-radius:50%;border:1px dashed rgba(232,0,28,.10);pointer-events:none;animation:spin-ccw 20s linear infinite}
+@keyframes spin-cw{to{transform:rotate(360deg)}}
+@keyframes spin-ccw{to{transform:rotate(-360deg)}}
+.spark{position:absolute;border-radius:50%;pointer-events:none;background:var(--red2);box-shadow:0 0 10px 3px rgba(255,30,50,.75)}
+.spark:nth-child(5){width:7px;height:7px;animation:orb 5s linear infinite}
+.spark:nth-child(6){width:5px;height:5px;animation:orb 5s linear infinite;animation-delay:-1.25s}
+.spark:nth-child(7){width:4px;height:4px;animation:orb 5s linear infinite;animation-delay:-2.5s}
+.spark:nth-child(8){width:6px;height:6px;animation:orb 5s linear infinite;animation-delay:-3.75s}
+@keyframes orb{0%{transform:rotate(0deg) translateX(min(38vw,168px)) rotate(0deg)}
+  100%{transform:rotate(360deg) translateX(min(38vw,168px)) rotate(-360deg)}}
+.sphere-btn{
+  position:relative;width:min(62vw,268px);height:min(62vw,268px);border-radius:50%;border:none;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+  background:radial-gradient(circle at 34% 24%,rgba(255,145,145,.70) 0%,rgba(255,80,90,.38) 16%,transparent 42%),
+    radial-gradient(circle at 68% 18%,rgba(255,110,110,.20) 0%,transparent 28%),
+    radial-gradient(circle at 44% 38%,#ff2a3c 0%,#e8001c 28%,#c2001a 52%,#8a0010 74%,#4a0008 100%);
+  box-shadow:0 0 0 14px rgba(218,0,22,.18),0 0 0 32px rgba(218,0,22,.08),
+    0 22px 70px rgba(210,0,20,.85),0 8px 28px rgba(210,0,20,.62),0 50px 108px rgba(180,0,16,.50),
+    0 44px 80px rgba(0,0,0,.60),inset 0 -20px 48px rgba(0,0,0,.62),
+    inset 0 9px 26px rgba(255,120,120,.22),inset 0 28px 55px rgba(0,0,0,.18);
+  transition:transform .13s var(--spring),box-shadow .16s var(--eout);
+  animation:breathe 3.8s ease-in-out infinite}
+.sphere-btn::before{content:'';position:absolute;top:7%;left:13%;width:44%;height:36%;
+  background:radial-gradient(ellipse at 38% 38%,rgba(255,255,255,.52) 0%,rgba(255,255,255,.18) 38%,transparent 72%);
+  border-radius:50%;pointer-events:none}
+.sphere-btn::after{content:'';position:absolute;bottom:3%;left:10%;width:80%;height:28%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.45) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 0 14px rgba(218,0,22,.18),0 0 0 32px rgba(218,0,22,.08),
+    0 22px 70px rgba(210,0,20,.85),0 8px 28px rgba(210,0,20,.62),0 50px 108px rgba(180,0,16,.50),
+    0 44px 80px rgba(0,0,0,.60),inset 0 -20px 48px rgba(0,0,0,.62),
+    inset 0 9px 26px rgba(255,120,120,.22),inset 0 28px 55px rgba(0,0,0,.18)}
+  50%{box-shadow:0 0 0 26px rgba(232,0,28,.28),0 0 0 52px rgba(232,0,28,.11),
+    0 0 0 80px rgba(232,0,28,.04),0 32px 100px rgba(232,0,28,1),
+    0 12px 38px rgba(232,0,28,.68),0 65px 135px rgba(200,0,20,.65),
+    0 44px 80px rgba(0,0,0,.60),inset 0 -20px 48px rgba(0,0,0,.62),
+    inset 0 12px 32px rgba(255,150,150,.28),inset 0 28px 55px rgba(0,0,0,.18)}}
+.sphere-btn:hover{transform:translateY(-10px) scale(1.06);animation:none;
+  box-shadow:0 0 0 28px rgba(232,0,28,.35),0 0 0 56px rgba(232,0,28,.12),
+    0 38px 120px rgba(232,0,28,1),0 14px 46px rgba(232,0,28,.70),
+    0 75px 160px rgba(210,0,24,.68),0 60px 90px rgba(0,0,0,.55),
+    inset 0 -24px 56px rgba(0,0,0,.62),inset 0 12px 36px rgba(255,145,145,.30)}
+.sphere-btn:active{transform:translateY(7px) scale(.94);animation:none;
+  box-shadow:0 0 0 5px rgba(232,0,28,.45),0 6px 24px rgba(232,0,28,.78),
+    0 18px 52px rgba(200,0,18,.48),inset 0 -12px 36px rgba(0,0,0,.72)}
+
+/* Q BUTTONS */
+.q-row{position:relative;z-index:5;display:flex;justify-content:center;
+  gap:clamp(18px,6vw,36px);padding:clamp(6px,2vw,14px) 24px 0}
+.q-btn{display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:none;border:none;transition:transform .22s var(--spring)}
+.q-btn:hover{transform:translateY(-6px) scale(1.10)}
+.q-btn:active{transform:scale(.90)}
+.q-shell{position:relative;width:clamp(60px,15vw,70px);height:clamp(60px,15vw,70px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;transition:box-shadow .22s var(--eout)}
+.q-shell::after{content:'';position:absolute;top:-10%;left:-60%;width:40%;height:120%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);
+  transform:skewX(-20deg);transition:left .5s ease;pointer-events:none}
+.q-btn:hover .q-shell::after{left:130%}
+.q-hi{position:absolute;top:8%;left:14%;width:36%;height:28%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.42) 0%,transparent 72%);
+  border-radius:50%;pointer-events:none;z-index:2}
+.q-red .q-shell{
+  background:radial-gradient(circle at 34% 26%,rgba(255,120,120,.55) 0%,transparent 38%),
+    radial-gradient(circle at 50% 50%,#ff2035,#cc0018,#7a000d);
+  box-shadow:0 6px 22px rgba(220,0,28,.62),0 0 0 2px rgba(255,60,80,.22),
+    inset 0 -7px 16px rgba(0,0,0,.45),inset 0 4px 10px rgba(255,100,100,.22)}
+.q-red:hover .q-shell{box-shadow:0 10px 36px rgba(232,0,28,.88),0 0 0 3px rgba(255,80,100,.32)}
+.q-dark .q-shell{
+  background:radial-gradient(circle at 32% 26%,rgba(80,100,150,.28) 0%,transparent 44%),
+    radial-gradient(circle at 50% 50%,#1e2d50,#0e1830,#080f22);
+  border:1.5px solid rgba(255,255,255,.10);
+  box-shadow:0 6px 22px rgba(0,0,0,.55),inset 0 -5px 14px rgba(0,0,0,.55)}
+.q-dark:hover .q-shell{border-color:rgba(255,255,255,.22);box-shadow:0 10px 32px rgba(0,0,0,.65)}
+.q-svg-icon{width:clamp(28px,7vw,34px);height:clamp(28px,7vw,34px);
+  position:relative;z-index:3;filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
+.q-lbl{font-size:clamp(11px,2.8vw,13px);font-weight:700;color:var(--silver);
+  letter-spacing:.3px;text-align:center}
+.q-lbl.hi{color:#fff;position:relative}
+.q-lbl.hi::after{content:'';position:absolute;bottom:-3px;left:0;right:0;
+  height:2px;background:var(--red);border-radius:2px}
+.q-bdg{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;
+  background:linear-gradient(135deg,#ff4400,#cc2200);border:2px solid var(--bg);
+  font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 3px}
+.q-btn.voice-active .q-shell{animation:vpulse 1.2s ease-in-out infinite}
+@keyframes vpulse{0%,100%{box-shadow:0 6px 22px rgba(220,0,28,.62),0 0 0 2px rgba(255,60,80,.22)}
+  50%{box-shadow:0 8px 30px rgba(232,0,28,.90),0 0 0 12px rgba(232,0,28,.15),0 0 0 22px rgba(232,0,28,.05)}}
+
+/* BOTTOM NAV */
+.bnav{position:relative;z-index:10;display:flex;align-items:flex-end;justify-content:space-around;
+  background:var(--nav);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-top:1px solid rgba(255,255,255,.055);padding:10px 6px clamp(14px,5vw,30px)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:none;border:none;padding:8px 4px;border-radius:14px;
+  color:var(--muted);transition:all .2s var(--eout)}
+.bn:hover{color:var(--silver);background:rgba(255,255,255,.045)}
+.bn.active{color:#fff}
+.bn-ico{width:clamp(22px,5.5vw,27px);height:clamp(22px,5.5vw,27px);transition:transform .22s var(--spring)}
+.bn:hover .bn-ico{transform:scale(1.20) translateY(-2px)}
+.bn-lbl{font-size:clamp(9px,2.3vw,11px);font-weight:700;letter-spacing:.2px}
+.bn-c{flex:1.2;position:relative;margin-top:-22px}
+.bn-sos{display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:none;border:none;width:100%;transition:transform .22s var(--spring)}
+.bn-sos:hover{transform:translateY(-4px) scale(1.08)}
+.bn-sos:active{transform:scale(.93)}
+.bn-sos-ring{width:clamp(54px,13vw,64px);height:clamp(54px,13vw,64px);border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,120,120,.55) 0%,transparent 36%),
+    radial-gradient(circle at 50% 50%,#ff2035,#e0001c,#8a000f);
+  border:3.5px solid var(--bg);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:clamp(14px,4vw,18px);letter-spacing:1.5px;color:#fff;
+  box-shadow:0 4px 20px rgba(232,0,28,.72),inset 0 -5px 12px rgba(0,0,0,.52);
+  transition:box-shadow .2s;position:relative}
+.bn-sos-ring::before{content:'';position:absolute;top:8%;left:14%;width:36%;height:28%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.38) 0%,transparent 72%);border-radius:50%}
+.bn-sos:hover .bn-sos-ring{box-shadow:0 8px 30px rgba(232,0,28,.92)}
+.bn-sos-lbl{font-size:clamp(9px,2.3vw,11px);font-weight:800;color:var(--red2);letter-spacing:.3px}
+
+/* LANG SELECT */
+#langselect{background:linear-gradient(168deg,#0b1530 0%,#04091a 100%);
+  align-items:center;justify-content:center;padding:0 24px;gap:0}
+.ls-logo{font-family:var(--fd);font-size:clamp(48px,14vw,72px);letter-spacing:6px;color:#fff;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 3px 6px rgba(0,0,20,.7);
+  text-align:center;margin-bottom:6px}
+.ls-sub{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);
+  font-weight:700;text-align:center;margin-bottom:28px}
+.ls-title{font-size:clamp(14px,4vw,18px);font-weight:800;color:var(--silver);
+  text-align:center;margin-bottom:16px}
+.ls-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;width:100%;max-width:360px}
+.ls-btn{background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+  padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:all .22s var(--spring);color:var(--silver)}
+.ls-btn:hover{background:rgba(255,255,255,.09);border-color:var(--gold);color:var(--white);
+  transform:translateY(-3px) scale(1.04)}
+.ls-btn:active{transform:scale(.96)}
+.ls-flag{font-size:28px;line-height:1}
+.ls-name{font-size:13px;font-weight:800}
+.ls-nat{font-size:11px;font-weight:600;opacity:.7}
+
+/* INNER PAGES */
+.inner-screen{background:linear-gradient(168deg,#0b1530 0%,#04091a 100%)}
+.pg-hdr{display:flex;align-items:center;gap:14px;
+  padding:clamp(18px,4.5vw,26px) clamp(18px,5vw,26px) clamp(12px,3vw,18px);
+  background:rgba(255,255,255,.022);border-bottom:1px solid var(--border);flex-shrink:0}
+.pg-bk{width:50px;height:50px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--silver);transition:all .2s var(--spring)}
+.pg-bk:hover{background:rgba(255,255,255,.09);border-color:var(--gold);color:var(--gold);transform:scale(1.06)}
+.pg-ttl{font-family:var(--fd);font-size:clamp(26px,7vw,38px);letter-spacing:4px;
+  color:var(--gold);text-shadow:0 0 20px rgba(245,197,24,.3)}
+.pg-body{flex:1;overflow-y:auto;padding:clamp(14px,4vw,20px);
+  padding-bottom:36px;display:flex;flex-direction:column;gap:12px}
+.pg-body::-webkit-scrollbar{width:3px}
+.pg-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:clamp(16px,4vw,20px);transition:border-color .2s}
+.scard:hover{border-color:var(--borderhi)}
+.sc-ttl{font-size:11px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.flbl{display:block;font-size:13px;font-weight:700;color:var(--silver);margin-bottom:8px}
+.finp{width:100%;background:rgba(0,0,0,.38);border:1.5px solid rgba(255,255,255,.10);
+  border-radius:13px;color:#fff;font-size:16px;font-family:var(--fb);font-weight:600;
+  padding:13px 15px;outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none}
+.finp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,24,.12)}
+select.finp{cursor:pointer}
+option{background:#0b1530;color:#fff}
+.fg{margin-bottom:12px}
+.cg{display:flex;flex-direction:column;gap:9px}
+.crow{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:center}
+.crow .finp{font-size:14px;padding:11px 12px}
+.cdel{width:44px;height:44px;flex-shrink:0;background:rgba(232,0,28,.10);
+  border:1.5px solid rgba(232,0,28,.26);border-radius:11px;color:#ff5566;font-size:18px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s var(--spring)}
+.cdel:hover{background:rgba(232,0,28,.22);transform:scale(1.10)}
+.cadd{width:100%;margin-top:9px;background:transparent;
+  border:2px dashed rgba(255,255,255,.11);border-radius:13px;
+  color:var(--muted);font-size:15px;font-weight:700;font-family:var(--fb);
+  padding:13px;transition:all .22s}
+.cadd:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.04)}
+.info-box{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.065);
+  border-radius:13px;padding:14px 15px;font-size:13px;color:var(--silver);
+  line-height:1.75;font-weight:600;white-space:pre-line}
+.sv-btn{width:100%;background:linear-gradient(150deg,#ff2035 0%,#e8001c 40%,#950010 100%);
+  border:none;border-radius:18px;color:#fff;font-size:18px;font-weight:800;
+  font-family:var(--fd);letter-spacing:4px;padding:19px;
+  box-shadow:0 6px 26px rgba(232,0,28,.46),inset 0 1px 0 rgba(255,150,160,.30);
+  transition:all .22s var(--spring)}
+.sv-btn:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 12px 38px rgba(232,0,28,.66)}
+.sv-btn:active{transform:translateY(2px) scale(.98)}
+
+/* VOICE PAGE */
+.vp-status-card{display:flex;flex-direction:column;align-items:center;gap:14px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 20px}
+.vp-orb{width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,120,120,.55) 0%,transparent 36%),
+    radial-gradient(circle at 50% 50%,#ff2035,#e0001c,#8a000f);
+  display:flex;align-items:center;justify-content:center;border:none;
+  box-shadow:0 6px 24px rgba(232,0,28,.55),inset 0 -5px 12px rgba(0,0,0,.5);
+  transition:all .22s var(--spring)}
+.vp-orb:hover{transform:scale(1.08)}
+.vp-orb.on{animation:orb-pulse 1.3s ease-in-out infinite}
+@keyframes orb-pulse{0%,100%{box-shadow:0 6px 24px rgba(232,0,28,.55),0 0 0 0 rgba(232,0,28,.4)}
+  50%{box-shadow:0 10px 36px rgba(232,0,28,.85),0 0 0 18px rgba(232,0,28,0)}}
+.vp-stat-txt{font-size:16px;font-weight:800;color:var(--silver);text-align:center}
+.vp-phrase-show{font-size:20px;font-weight:900;color:var(--gold);text-align:center}
+.vp-transcript{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:13px;
+  padding:14px;font-size:13px;color:var(--silver);min-height:52px;
+  font-weight:600;line-height:1.6;word-break:break-word}
+.toggle-btn{width:100%;padding:16px;border-radius:14px;border:none;
+  font-size:16px;font-weight:800;font-family:var(--fb);letter-spacing:.5px;
+  transition:all .22s var(--spring)}
+.toggle-btn.off{background:rgba(232,0,28,.12);border:2px solid rgba(232,0,28,.3);color:var(--red3)}
+.toggle-btn.off:hover{background:rgba(232,0,28,.22);border-color:var(--red)}
+.toggle-btn.on{background:linear-gradient(135deg,#ff2035,#aa0010);color:#fff;
+  box-shadow:0 6px 22px rgba(232,0,28,.45)}
+.toggle-btn.on:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(232,0,28,.65)}
+
+/* CONFIRM POPUP */
+#confirmPop{display:none;position:fixed;inset:0;z-index:998;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:24px}
+#confirmPop.show{display:flex}
+.cp-inner{background:linear-gradient(145deg,#0e1c38,#04091a);
+  border:1.5px solid rgba(232,0,28,.4);border-radius:24px;
+  padding:28px 24px 24px;width:100%;max-width:380px;
+  box-shadow:0 0 60px rgba(232,0,28,.25),0 20px 60px rgba(0,0,0,.6);
+  position:relative;overflow:hidden}
+.cp-glow{position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  width:180px;height:60px;background:rgba(232,0,28,.18);
+  border-radius:50%;filter:blur(20px);pointer-events:none}
+.cp-icon{text-align:center;font-size:48px;margin-bottom:12px}
+.cp-dots{display:flex;justify-content:center;gap:8px;margin-bottom:18px}
+.cp-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s}
+.cp-dot.active{background:var(--red2);box-shadow:0 0 10px var(--red2);transform:scale(1.3)}
+.cp-dot.done{background:var(--success);box-shadow:0 0 8px var(--success)}
+.cp-msg{font-size:clamp(16px,4.5vw,20px);font-weight:700;color:#fff;
+  text-align:center;line-height:1.5;margin-bottom:18px;min-height:60px;
+  text-shadow:0 0 20px rgba(232,0,28,.3)}
+.cp-hint{font-size:12px;color:rgba(245,197,24,0.75);text-align:center;
+  margin-bottom:8px;font-weight:600;line-height:1.4;min-height:28px}
+.cp-transcript{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:10px 14px;font-size:13px;color:rgba(255,255,255,.6);
+  min-height:36px;margin-bottom:20px;font-style:italic;text-align:center}
+.cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cp-cancel{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:16px;padding:16px;color:#aaa;font-size:17px;font-weight:800;
+  font-family:var(--fb);display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .22s}
+.cp-cancel:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;transform:scale(1.04)}
+.cp-ok{background:linear-gradient(135deg,#ff2035,#8c000f);border:none;
+  border-radius:16px;padding:16px;color:#fff;font-size:17px;font-weight:800;
+  font-family:var(--fb);display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 24px rgba(232,0,28,.5),inset 0 1px 0 rgba(255,150,160,.3);
+  transition:all .22s}
+.cp-ok:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 10px 36px rgba(232,0,28,.7)}
+
+/* ALERT OVERLAY */
+#aov{display:none;position:fixed;inset:0;z-index:999;
+  background:radial-gradient(ellipse at 50% 40%,rgba(200,0,22,.96) 0%,rgba(70,0,8,.99) 100%);
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:28px 22px;animation:aov-in .36s var(--eout)}
+#aov.show{display:flex}
+@keyframes aov-in{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+.aov-ic{font-size:64px;animation:shk .5s ease 3}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-15px) rotate(-5deg)}75%{transform:translateX(15px) rotate(5deg)}}
+.aov-ttl{font-family:var(--fd);font-size:clamp(38px,11vw,60px);letter-spacing:6px;color:#fff}
+.aov-msg{font-size:14px;font-weight:600;color:rgba(255,255,255,.86);text-align:center;
+  line-height:1.55;max-width:340px}
+.aov-steps{display:flex;flex-direction:column;gap:8px;width:100%;
+  max-width:360px;max-height:200px;overflow-y:auto}
+.aov-step{display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.17);
+  border-radius:13px;padding:12px 16px;font-size:14px;font-weight:700;color:#fff;
+  text-decoration:none;transition:all .2s}
+.aov-step:hover{background:rgba(255,255,255,.17)}
+.aov-step.done{border-color:var(--success);background:rgba(34,212,106,.10)}
+.aov-step span:first-child{font-size:18px;flex-shrink:0}
+.aov-dis{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.28);
+  border-radius:14px;color:#fff;font-size:15px;font-weight:800;font-family:var(--fb);
+  padding:13px 38px;transition:all .2s}
+.aov-dis:hover{background:rgba(255,255,255,.22);transform:scale(1.04)}
+
+/* BG BADGE */
+.bg-badge{position:fixed;bottom:90px;right:14px;z-index:50;
+  background:rgba(34,212,106,.15);border:1.5px solid rgba(34,212,106,.4);
+  border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;color:var(--success);
+  display:none;align-items:center;gap:6px;letter-spacing:.5px}
+.bg-badge.show{display:flex}
+.bg-dot{width:7px;height:7px;border-radius:50%;background:var(--success);
+  box-shadow:0 0 6px var(--success);animation:blink 1.5s ease infinite}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(72px);
+  background:#0e1c38;border:1.5px solid var(--gold);border-radius:13px;
+  color:#fff;font-size:14px;font-weight:700;padding:12px 22px;z-index:1000;
+  transition:transform .36s var(--spring);white-space:nowrap;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ===== MENU DRAWER (replaces old settings page) ===== */
+#menuDrawer{display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  align-items:flex-start;justify-content:flex-end}
+#menuDrawer.show{display:flex}
+.menu-panel{background:linear-gradient(168deg,#0d1b38 0%,#04091a 100%);
+  border-left:1px solid rgba(255,255,255,.09);
+  width:min(320px,88vw);height:100vh;height:100dvh;
+  display:flex;flex-direction:column;overflow-y:auto;
+  box-shadow:-8px 0 48px rgba(0,0,0,.7);
+  animation:drawer-in .28s var(--eout)}
+@keyframes drawer-in{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.menu-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:clamp(18px,5vw,28px) 20px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.menu-hdr-ttl{font-family:var(--fd);font-size:28px;letter-spacing:4px;color:var(--gold)}
+.menu-close{width:40px;height:40px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);
+  border-radius:12px;color:var(--silver);font-size:18px;transition:all .2s}
+.menu-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.menu-nav{display:flex;flex-direction:column;gap:6px;padding:16px 14px}
+.menu-item{display:flex;align-items:center;gap:14px;padding:15px 16px;
+  border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.065);
+  color:var(--silver);font-size:15px;font-weight:700;transition:all .22s var(--eout);cursor:pointer}
+.menu-item:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#fff;transform:translateX(4px)}
+.menu-item:active{transform:scale(.98)}
+.menu-item-ico{width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.mi-sos .menu-item-ico{background:rgba(232,0,28,.18);border:1px solid rgba(232,0,28,.3)}
+.mi-voice .menu-item-ico{background:rgba(34,212,106,.12);border:1px solid rgba(34,212,106,.25)}
+.mi-contact .menu-item-ico{background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.25)}
+.mi-account .menu-item-ico{background:rgba(120,100,200,.18);border:1px solid rgba(120,100,200,.3)}
+.menu-item-txt{flex:1}
+.menu-item-ttl{font-size:15px;font-weight:800;color:#fff}
+.menu-item-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.menu-item-arr{color:var(--muted);font-size:14px}
+
+/* ===== SUB-PAGES inside drawer ===== */
+.sub-page{display:none;position:fixed;inset:0;z-index:910;
+  background:linear-gradient(168deg,#0b1530 0%,#04091a 100%);
+  flex-direction:column}
+.sub-page.active{display:flex}
+
+/* ===== SOS SETTINGS ===== */
+/* uses .scard, .finp, .sv-btn already defined */
+
+/* ===== CONTACT SETTINGS — drag reorder ===== */
+.cs-section{margin-bottom:6px}
+.cs-sh{font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;
+  color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cs-list{display:flex;flex-direction:column;gap:6px;min-height:40px}
+.cs-row{display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.045);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:14px;padding:11px 12px;transition:all .2s;cursor:default;
+  user-select:none;-webkit-user-select:none;touch-action:none}
+.cs-row.selected{border-color:rgba(245,197,24,.4);background:rgba(245,197,24,.06)}
+.cs-row.dragging{opacity:.4;border-style:dashed}
+.cs-row.drag-over{border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,197,24,.25)}
+.cs-row.unselected{opacity:.55}
+.cs-drag{width:30px;display:flex;flex-direction:column;gap:3px;align-items:center;
+  cursor:grab;flex-shrink:0;padding:4px 0}
+.cs-drag span{display:block;width:16px;height:2px;background:rgba(255,255,255,.3);border-radius:2px}
+.cs-drag:active{cursor:grabbing}
+.cs-badge{width:22px;height:22px;border-radius:50%;background:var(--gold);
+  color:#000;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s}
+.cs-badge.empty{background:rgba(255,255,255,.1);color:var(--muted)}
+.cs-name{flex:1;font-size:13px;font-weight:700;color:#fff}
+.cs-phone{font-size:11px;color:var(--muted);font-weight:600}
+.cs-sel{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.2);
+  background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;cursor:pointer;font-size:12px;color:transparent}
+.cs-sel.checked{background:var(--gold);border-color:var(--gold);color:#000}
+
+/* drag clone */
+.drag-clone{position:fixed;pointer-events:none;z-index:9999;
+  background:rgba(245,197,24,.15);border:2px solid var(--gold);
+  border-radius:14px;padding:11px 12px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 28px rgba(0,0,0,.6);opacity:.92;
+  min-width:200px;max-width:90vw}
+
+/* ACCOUNT SETTINGS */
+.acct-row{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;padding:16px 18px;cursor:pointer;transition:all .2s}
+.acct-row:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16)}
+.acct-row-lbl{font-size:14px;font-weight:800;color:#fff}
+.acct-row-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600}
+.acct-row-arr{color:var(--muted);font-size:16px}
+.acct-sep{height:1px;background:rgba(255,255,255,.06);margin:6px 0}
+
+/* CHANGE PASSWORD CARD */
+#pwCard{display:none;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;padding:16px;margin-top:6px}
+#pwCard.show{display:block}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- BG BADGE -->
+<div class="bg-badge" id="bgBadge">
+  <div class="bg-dot"></div>
+  <span id="bgBadgeTxt">Active in background</span>
+</div>
+
+<!-- LANG SELECT -->
+<div id="langselect" class="screen">
+  <div class="ls-logo">Hatzilu</div>
+  <div class="ls-sub">Emergency Alert</div>
+  <div class="ls-title">Choose Your Language</div>
+  <div class="ls-grid">
+    <button class="ls-btn" onclick="selectLang('en')">
+      <span class="ls-code">EN</span><span class="ls-name">English</span><span class="ls-nat">English</span></button>
+    <button class="ls-btn" onclick="selectLang('ta')">
+      <span class="ls-code">TA</span><span class="ls-name">Tamil</span><span class="ls-nat">&#2980;&#2990;&#3007;&#2996;&#3021;</span></button>
+    <button class="ls-btn" onclick="selectLang('ml')">
+      <span class="ls-code">ML</span><span class="ls-name">Malayalam</span><span class="ls-nat">&#3374;&#3378;&#3375;&#3390;&#3379;&#3330;</span></button>
+    <button class="ls-btn" onclick="selectLang('hi')">
+      <span class="ls-code">HI</span><span class="ls-name">Hindi</span><span class="ls-nat">&#2361;&#2367;&#2306;&#2342;&#2368;</span></button>
+    <button class="ls-btn" onclick="selectLang('te')">
+      <span class="ls-code">TE</span><span class="ls-name">Telugu</span><span class="ls-nat">&#3108;&#3142;&#3122;&#3137;&#3095;&#3137;</span></button>
+    <button class="ls-btn" onclick="selectLang('kn')">
+      <span class="ls-code">KN</span><span class="ls-name">Kannada</span><span class="ls-nat">&#3221;&#3240;&#3277;&#3240;&#3233;</span></button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="topbar">
+    <div class="lang-dropdown-wrap">
+      <button class="lang-btn" id="langDropBtn" onclick="toggleLangDrop()">
+        <span class="lang-tiny-icon">&#127760;</span>
+        <span id="langName">EN</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="lang-dropdown" id="langDrop">
+        <button class="lang-opt" onclick="selectLangDrop('en')"><span class="lo-code">EN</span><span class="lo-name">English</span></button>
+        <button class="lang-opt" onclick="selectLangDrop('ta')"><span class="lo-code">TA</span><span class="lo-name">&#2980;&#2990;&#3007;&#2996;&#3021; Tamil</span></button>
+        <button class="lang-opt" onclick="selectLangDrop('ml')"><span class="lo-code">ML</span><span class="lo-name">&#3374;&#3378;&#3375;&#3390;&#3379;&#3330; Malayalam</span></button>
+        <button class="lang-opt" onclick="selectLangDrop('hi')"><span class="lo-code">HI</span><span class="lo-name">&#2361;&#2367;&#2306;&#2342;&#2368; Hindi</span></button>
+        <button class="lang-opt" onclick="selectLangDrop('te')"><span class="lo-code">TE</span><span class="lo-name">&#3108;&#3142;&#3122;&#3137;&#3095;&#3137; Telugu</span></button>
+        <button class="lang-opt" onclick="selectLangDrop('kn')"><span class="lo-code">KN</span><span class="lo-name">&#3221;&#3240;&#3277;&#3240;&#3233; Kannada</span></button>
+      </div>
+    </div>
+    <button class="t-menu" onclick="openMenuDrawer()">
+      <span></span><span></span><span></span>
+      <div class="t-badge" id="cBadge">0</div>
+    </button>
+  </div>
+
+  <div class="title-block">
+    <div class="title-h1">Hatzilu</div>
+    <div class="title-sub" id="ui-subtitle">Emergency Situation Alert</div>
+  </div>
+
+  <div class="status-row">
+    <div class="sp" id="locPill"><span class="sdot" id="locDot"></span><span id="locTxt">GPS off</span></div>
+    <div class="sp" id="micPill"><span class="sdot" id="micDot"></span><span id="micTxt">Voice off</span></div>
+  </div>
+
+  <div class="sphere-stage">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="orbit-dash"></div><div class="orbit-dash2"></div>
+    <div class="spark"></div><div class="spark"></div><div class="spark"></div><div class="spark"></div>
+    <button class="sphere-btn" id="mainBtn" aria-label="Emergency"></button>
+  </div>
+
+  <div class="q-row">
+    <!-- MIC → Toggle voice on/off directly -->
+    <button class="q-btn q-red" id="micBtn">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <div class="q-bdg" id="micBdg" style="display:none">&#9679;</div>
+        <svg class="q-svg-icon" id="micSvgIcon" viewBox="0 0 48 48" fill="none">
+          <rect x="17" y="4" width="14" height="22" rx="7" fill="white" opacity="0.95"/>
+          <path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="17" y1="44" x2="31" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="q-lbl hi" id="ui-q1">Start Voice</span>
+    </button>
+    <!-- BELL → Test -->
+    <button class="q-btn q-red" id="testBtn">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <svg class="q-svg-icon" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4C16 8 12 14 12 24v8l-4 4h32l-4-4v-8C36 14 32 8 24 4Z" fill="#FFD700"/>
+          <ellipse cx="19" cy="10" rx="3" ry="5" fill="rgba(255,255,255,0.28)" transform="rotate(-22 19 10)"/>
+          <circle cx="24" cy="41.5" r="3.5" fill="#FFD700" opacity="0.8"/>
+        </svg>
+      </div>
+      <span class="q-lbl" id="ui-q2">Test Alert</span>
+    </button>
+    <!-- GEAR → Account Settings -->
+    <button class="q-btn q-dark" onclick="openSubPage('accountSettings')">
+      <div class="q-shell">
+        <div class="q-hi"></div>
+        <svg class="q-svg-icon" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="6.5" fill="#c8d8f0" opacity="0.92"/>
+          <path d="M38.5 20.8l-2.9-1.1a13.2 13.2 0 00-1.1-2.7l1.2-2.9-3.8-3.8-2.9 1.2a13 13 0 00-2.7-1.1L25.2 7.5h-5.4l-1.1 2.9a13 13 0 00-2.7 1.1L13.1 10.3 9.3 14.1l1.2 2.9a13.2 13.2 0 00-1.1 2.7l-2.9 1.1v5.4l2.9 1.1a13 13 0 001.1 2.7l-1.2 2.9 3.8 3.8 2.9-1.2a13 13 0 002.7 1.1l1.1 2.9h5.4l1.1-2.9a13.2 13.2 0 002.7-1.1l2.9 1.2 3.8-3.8-1.2-2.9a13 13 0 001.1-2.7l2.9-1.1Z" fill="#8aacd0" opacity="0.78"/>
+        </svg>
+      </div>
+      <span class="q-lbl" id="ui-q3">Settings</span>
+    </button>
+  </div>
+
+  <div class="bnav">
+    <button class="bn active" onclick="showScreen('home')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <path d="M3 12.5L14 3.5l11 9v11a1 1 0 01-1 1H17v-6h-6v6H4a1 1 0 01-1-1Z" fill="#f5a623" opacity="0.88"/>
+      </svg>
+      <span class="bn-lbl" id="ui-nav1">Home</span>
+    </button>
+    <button class="bn" onclick="minimizeApp()">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="12" width="20" height="3" rx="1.5" fill="#cc3333"/>
+        <rect x="4" y="18" width="14" height="3" rx="1.5" fill="#cc3333" opacity="0.7"/>
+      </svg>
+      <span class="bn-lbl" id="ui-nav2">Minimize</span>
+    </button>
+    <div class="bn-c">
+      <button class="bn-sos" onclick="triggerSOS()">
+        <div class="bn-sos-ring">SOS</div>
+        <span class="bn-sos-lbl" id="ui-nav3">Instant</span>
+      </button>
+    </div>
+    <button class="bn" onclick="showScreen('contactpage')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="3" width="20" height="22" rx="2" fill="#d4b896" opacity="0.8"/>
+        <rect x="7.5" y="7.5" width="13" height="1.8" rx="1" fill="#7a5a3a"/>
+        <rect x="7.5" y="11.5" width="13" height="1.8" rx="1" fill="#7a5a3a"/>
+        <rect x="7.5" y="15.5" width="9" height="1.8" rx="1" fill="#7a5a3a"/>
+        <circle cx="22" cy="22" r="4" fill="#e8001c"/>
+        <text x="22" y="25.5" text-anchor="middle" font-size="5.5" font-weight="900" fill="white">!</text>
+      </svg>
+      <span class="bn-lbl" id="ui-nav4">Contacts</span>
+    </button>
+    <button class="bn" onclick="showScreen('profilepage')">
+      <svg class="bn-ico" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="9.5" r="4.5" fill="#a890d0" opacity="0.88"/>
+        <path d="M4.5 24.5c0-5 4-8.5 9.5-8.5s9.5 3.5 9.5 8.5" fill="#a890d0" opacity="0.72"/>
+      </svg>
+      <span class="bn-lbl" id="ui-nav5">Profile</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== MENU DRAWER ===== -->
+<div id="menuDrawer" onclick="closeMenuDrawerOutside(event)">
+  <div class="menu-panel" id="menuPanel">
+    <div class="menu-hdr">
+      <div class="menu-hdr-ttl">MENU</div>
+      <button class="menu-close" onclick="closeMenuDrawer()">&#10005;</button>
+    </div>
+    <div class="menu-nav">
+      <div class="menu-item mi-sos" onclick="openSubPage('sosSettings')">
+        <div class="menu-item-ico">&#128680;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-sos-ttl">SOS Settings</div>
+          <div class="menu-item-sub" id="ui-menu-sos-sub">SMS, WhatsApp &amp; Call numbers</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+      <div class="menu-item mi-voice" onclick="openSubPage('voiceSettings')">
+        <div class="menu-item-ico">&#127908;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-voice-ttl">Voice Settings</div>
+          <div class="menu-item-sub" id="ui-menu-voice-sub">Detection phrase, language</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+      <div class="menu-item mi-contact" onclick="openSubPage('contactSettings')">
+        <div class="menu-item-ico">&#128222;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-contact-ttl">Contact Settings</div>
+          <div class="menu-item-sub" id="ui-menu-contact-sub">Select &amp; order alert recipients</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+      <div class="menu-item mi-account" onclick="openSubPage('accountSettings')">
+        <div class="menu-item-ico">&#128100;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-account-ttl">Account Settings</div>
+          <div class="menu-item-sub" id="ui-menu-account-sub">Name, password, app language</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+      <div class="menu-item mi-sim" onclick="openSubPage('simSettings')">
+        <div class="menu-item-ico" style="background:rgba(100,180,255,.14);border:1px solid rgba(100,180,255,.28)">&#128242;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-sim-ttl">Default SIM &amp; WhatsApp Settings</div>
+          <div class="menu-item-sub" id="ui-menu-sim-sub">SMS SIM, WhatsApp number, Call SIM</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+      <div class="menu-item mi-test" onclick="openSubPage('testAlertSettings')">
+        <div class="menu-item-ico" style="background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.28)">&#128276;</div>
+        <div class="menu-item-txt">
+          <div class="menu-item-ttl" id="ui-menu-test-ttl">Test Alert Settings</div>
+          <div class="menu-item-sub" id="ui-menu-test-sub">Numbers to receive test alerts</div>
+        </div>
+        <div class="menu-item-arr">&#9654;</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TEST ALERT SETTINGS SUB-PAGE ===== -->
+<div id="testAlertSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('testAlertSettings')">&#9664;</button>
+    <div class="pg-ttl" id="ui-test-pg-ttl">&#128276; TEST ALERT</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div style="font-size:13px;color:var(--silver);font-weight:600;margin-bottom:14px;line-height:1.6" id="ui-test-desc">
+        Set the numbers that will receive alerts when the Test Alert button is tapped on the home screen.
+      </div>
+      <div class="sc-ttl" id="ui-test-sms-ttl">&#128241; SMS Test Number</div>
+      <label class="flbl" id="ui-test-sms-lbl">Phone number to receive test SMS</label>
+      <input class="finp" type="tel" id="testSmsNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" id="ui-test-sms-hint">Test SMS alert will be sent to this number</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-test-wa-ttl">&#128172; WhatsApp Test Number</div>
+      <label class="flbl" id="ui-test-wa-lbl">Phone number to receive test WhatsApp alert</label>
+      <input class="finp" type="tel" id="testWaNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" id="ui-test-wa-hint">Test WhatsApp alert will be sent to this number</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-test-call-ttl">&#128222; Call Test Number</div>
+      <label class="flbl" id="ui-test-call-lbl">Phone number to receive test call</label>
+      <input class="finp" type="tel" id="testCallNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" id="ui-test-call-hint">Test call will be made to this number</div>
+    </div>
+    <button class="sv-btn" onclick="saveTestAlertSettings()" id="ui-test-save-btn">&#128190; SAVE TEST SETTINGS</button>
+  </div>
+</div>
+
+<!-- ===== DEFAULT SIM & WHATSAPP SETTINGS SUB-PAGE ===== -->
+<div id="simSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('simSettings')">&#9664;</button>
+    <div class="pg-ttl" id="ui-sim-pg-ttl">&#128242; SIM SETTINGS</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sim-sms-ttl">&#128241; SMS Alert SIM</div>
+      <label class="flbl" id="ui-sim-sms-lbl">Default SIM for sending SMS alerts</label>
+      <select class="finp" id="defaultSmsSim">
+        <option value="sim1">SIM 1</option>
+        <option value="sim2">SIM 2</option>
+      </select>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sim-wa-ttl">&#128172; WhatsApp Alert Number</div>
+      <label class="flbl" id="ui-sim-wa-lbl">Default WhatsApp number for alerts</label>
+      <input class="finp" type="tel" id="defaultWaNumber" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" id="ui-sim-wa-hint">Enter the WhatsApp registered number to use by default for all WhatsApp alerts</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sim-call-ttl">&#128222; Phone Call SIM</div>
+      <label class="flbl" id="ui-sim-call-lbl">Default SIM for making calls</label>
+      <select class="finp" id="defaultCallerSim">
+        <option value="sim1">SIM 1</option>
+        <option value="sim2">SIM 2</option>
+      </select>
+    </div>
+    <button class="sv-btn" onclick="saveSimSettings()" id="ui-sim-save-btn">&#128190; SAVE SETTINGS</button>
+  </div>
+</div>
+
+<!-- ===== SOS SETTINGS SUB-PAGE ===== -->
+<div id="sosSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('sosSettings')">&#9664;</button>
+    <div class="pg-ttl">&#128680; SOS SETTINGS</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sos-sms-ttl">&#128241; SMS Alert Number</div>
+      <label class="flbl" id="ui-sos-sms-lbl">Phone number for SOS SMS</label>
+      <input class="finp" type="tel" id="sosSmsNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:7px;font-weight:600">
+        <span id="ui-sos-sms-hint">SOS button press - SMS alert will be sent to this number</span>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sos-wa-ttl">&#128172; WhatsApp Alert Number</div>
+      <label class="flbl" id="ui-sos-wa-lbl">Phone number for SOS WhatsApp</label>
+      <input class="finp" type="tel" id="sosWaNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:7px;font-weight:600">
+        <span id="ui-sos-wa-hint">SOS button press - WhatsApp alert will be sent to this number</span>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sos-call-ttl">&#128222; Call Number</div>
+      <label class="flbl" id="ui-sos-call-lbl">Phone number to call during SOS</label>
+      <input class="finp" type="tel" id="sosCallNum" placeholder="+91XXXXXXXXXX"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:7px;font-weight:600">
+        <span id="ui-sos-call-hint">SOS button press - direct call will be made to this number</span>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-sos-sim-ttl">&#128241; SMS SIM Settings</div>
+      <div class="fg">
+        <label class="flbl" id="ui-sos-sim-lbl">SIM for SMS &amp; Calls</label>
+        <select class="finp" id="smsSim">
+          <option value="sim1">SIM 1</option>
+          <option value="sim2">SIM 2</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="flbl" id="ui-sos-caller-lbl">Caller SIM</label>
+        <select class="finp" id="callerSim">
+          <option value="sim1">SIM 1</option>
+          <option value="sim2">SIM 2</option>
+        </select>
+      </div>
+      <div>
+        <label class="flbl" id="ui-sos-wa-sim-lbl">WhatsApp Number for SOS Alert</label>
+        <input class="finp" type="tel" id="sosWaSimNum" placeholder="+91XXXXXXXXXX"/>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" id="ui-sos-wa-sim-hint">Enter the WhatsApp registered number to use for SOS alerts</div>
+      </div>
+    </div>
+    <button class="sv-btn" onclick="saveSosSettings()" id="ui-sos-save-btn">&#128190; SAVE SOS SETTINGS</button>
+  </div>
+</div>
+
+<!-- ===== VOICE SETTINGS SUB-PAGE ===== -->
+<div id="voiceSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('voiceSettings')">&#9664;</button>
+    <div class="pg-ttl" id="ui-vp-title">&#127908; VOICE</div>
+  </div>
+  <div class="pg-body">
+    <div class="vp-status-card">
+      <button class="vp-orb" id="vpOrb" onclick="toggleVoice()">
+        <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+          <rect x="17" y="4" width="14" height="22" rx="7" fill="white"/>
+          <path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="17" y1="44" x2="31" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="vp-stat-txt" id="vp-stat">Voice Detection OFF</div>
+      <div class="vp-phrase-show" id="vp-phrase-show">"help me"</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-vp-transcript-title">&#128225; Live Transcript</div>
+      <div class="vp-transcript" id="vpTranscript">--</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-vp-settings-title">&#9881; Voice Settings</div>
+      <div class="fg">
+        <label class="flbl" id="ui-vp-lang-lbl">Recognition Language</label>
+        <select class="finp" id="vpLang">
+          <option value="en-IN">English (India)</option>
+          <option value="ta-IN">Tamil</option>
+          <option value="ml-IN">Malayalam</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="te-IN">Telugu</option>
+          <option value="kn-IN">Kannada</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </div>
+      <div>
+        <label class="flbl" id="ui-vp-phrase-lbl">Activation Phrase</label>
+        <input class="finp" type="text" id="vpWord" placeholder="help me"/>
+        <div style="font-size:12px;color:var(--muted);margin-top:7px;font-weight:600" id="ui-vp-hint">
+          Say this phrase to trigger confirmation popup
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn off" id="vpToggleBtn" onclick="toggleVoice()">&#127908; START VOICE DETECTION</button>
+    <button class="sv-btn" onclick="saveVoiceSettings()">&#128190; <span id="ui-vp-save">SAVE VOICE SETTINGS</span></button>
+  </div>
+</div>
+
+<!-- ===== CONTACT SETTINGS SUB-PAGE ===== -->
+<div id="contactSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('contactSettings')">&#9664;</button>
+    <div class="pg-ttl">&#128222; CONTACT SETTINGS</div>
+  </div>
+  <div class="pg-body">
+    <!-- SMS Alert -->
+    <div class="scard">
+      <div class="sc-ttl" id="ui-cs-sms-ttl">&#128241; SMS Alert</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px" id="ui-cs-sms-desc">Select &amp; drag to set send order. Selected contacts receive SMS alerts.</div>
+      <div class="cs-list" id="csSMSList"></div>
+    </div>
+    <!-- WhatsApp Alert -->
+    <div class="scard">
+      <div class="sc-ttl" id="ui-cs-wa-ttl">&#128172; WhatsApp Alert</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px" id="ui-cs-wa-desc">Select &amp; drag to set send order for WhatsApp alerts.</div>
+      <div class="cs-list" id="csWAList"></div>
+    </div>
+    <!-- Call Alert -->
+    <div class="scard">
+      <div class="sc-ttl" id="ui-cs-call-ttl">&#128222; Phone Call Alert</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px" id="ui-cs-call-desc">Select &amp; drag to set call order. Calls go one by one in this order.</div>
+      <div class="cs-list" id="csCallList"></div>
+    </div>
+    <button class="sv-btn" onclick="saveContactSettings()" id="ui-cs-save-btn">&#128190; <span id="ui-cs-save">SAVE SETTINGS</span></button>
+  </div>
+</div>
+
+<!-- ===== ACCOUNT SETTINGS SUB-PAGE ===== -->
+<div id="accountSettings" class="sub-page">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="closeSubPage('accountSettings')">&#9664;</button>
+    <div class="pg-ttl">&#128100; ACCOUNT</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl">&#127760; App Language</div>
+      <select class="finp" id="appLang" onchange="applyLang(this.value,true)">
+        <option value="en">English</option>
+        <option value="ta">Tamil</option>
+        <option value="ml">Malayalam</option>
+        <option value="hi">Hindi</option>
+        <option value="te">Telugu</option>
+        <option value="kn">Kannada</option>
+      </select>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-acct-name-ttl">&#128100; Your Name</div>
+      <label class="flbl" id="ui-name-lbl">Name shown in alert message</label>
+      <input class="finp" type="text" id="uName" placeholder="Amma, Thatha..."/>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-acct-preview-ttl">&#128172; Alert Preview</div>
+      <div class="info-box" id="ui-acct-preview-box">&#128680; EMERGENCY! <span id="pName">Your Name</span> <span id="ui-preview-needs">needs HELP!</span>
+&#128205; <span id="ui-preview-gps">[GPS Location]</span>
+&#8987; <span id="ui-preview-time">[Auto timestamp]</span>
+<span id="ui-preview-respond">Please respond IMMEDIATELY!</span> &#128591;</div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl">&#128274; Account</div>
+      <div class="acct-row" onclick="togglePwCard()">
+        <div>
+          <div class="acct-row-lbl" id="ui-acct-pw-lbl">Change Password</div>
+          <div class="acct-row-sub" id="ui-acct-pw-sub">Update your app password</div>
+        </div>
+        <div class="acct-row-arr" id="pwArrow">&#9654;</div>
+      </div>
+      <div id="pwCard">
+        <div class="fg" style="margin-top:12px">
+          <label class="flbl" id="ui-pw-cur-lbl">Current Password</label>
+          <input class="finp" type="password" id="pwCurrent" placeholder="Current password" id2="ui-pw-cur-ph"/>
+        </div>
+        <div class="fg">
+          <label class="flbl" id="ui-pw-new-lbl">New Password</label>
+          <input class="finp" type="password" id="pwNew" placeholder="New password"/>
+        </div>
+        <div class="fg">
+          <label class="flbl" id="ui-pw-conf-lbl">Confirm New Password</label>
+          <input class="finp" type="password" id="pwConfirm" placeholder="Confirm password"/>
+        </div>
+        <button class="sv-btn" style="margin-top:6px;font-size:14px;padding:14px;letter-spacing:2px" onclick="changePassword()">&#128274; CHANGE PASSWORD</button>
+      </div>
+      <div class="acct-sep"></div>
+      <div class="acct-row" onclick="logOut()" style="margin-top:4px">
+        <div>
+          <div class="acct-row-lbl" style="color:#ff5566" id="ui-acct-logout-lbl">&#128682; Log Out</div>
+          <div class="acct-row-sub" id="ui-acct-logout-sub">Clear session and restart</div>
+        </div>
+        <div class="acct-row-arr">&#9654;</div>
+      </div>
+    </div>
+    <button class="sv-btn" onclick="saveAccountSettings()" id="ui-acct-save-btn">&#128190; <span id="ui-acct-save">SAVE SETTINGS</span></button>
+  </div>
+</div>
+
+<!-- CONTACTS PAGE (existing, maintained) -->
+<div id="contactpage" class="screen inner-screen">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="showScreen('home')">&#9664;</button>
+    <div class="pg-ttl" id="ui-cp-title">&#128222; CONTACTS</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl"><span id="ui-cp-card-title">Emergency Contacts</span>
+        <span style="color:var(--muted);font-weight:600;font-size:10px">MAX 7</span></div>
+      <div class="cg" id="cpList"></div>
+      <button class="cadd" id="cpAddBtn" onclick="addContact()">&#65291; <span id="ui-cp-add">Add Contact</span></button>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl" id="ui-cp-info-title">&#8505;&#65039; How Alerts Work</div>
+      <div class="info-box" id="ui-cp-info">When EMERGENCY triggers:
+&#9312; Confirm SMS &#8594; sends to all contacts
+&#9313; Confirm WhatsApp &#8594; opens for all
+&#9314; Confirm Call &#8594; calls one by one
+&#128483; Voice or tap OK/Cancel at each step</div>
+    </div>
+    <button class="sv-btn" onclick="saveContacts()">&#128190; <span id="ui-cp-save">SAVE CONTACTS</span></button>
+  </div>
+</div>
+
+<!-- CONFIRM POPUP -->
+<div id="confirmPop">
+  <div class="cp-inner">
+    <div class="cp-glow"></div>
+    <div class="cp-icon" id="cpIcon">&#128241;</div>
+    <div class="cp-dots">
+      <div class="cp-dot" id="cpDot0"></div>
+      <div class="cp-dot" id="cpDot1"></div>
+      <div class="cp-dot" id="cpDot2"></div>
+    </div>
+    <div class="cp-msg" id="cpMsg"></div>
+    <div class="cp-hint" id="cpHint"></div>
+    <div class="cp-transcript" id="cpTranscript">Listening for OK / Cancel...</div>
+    <div class="cp-btns">
+      <button class="cp-cancel" onclick="confirmAction(false)">
+        <span>&#10060;</span><span id="cpCancelTxt">Cancel</span>
+      </button>
+      <button class="cp-ok" onclick="confirmAction(true)">
+        <span>&#9989;</span><span id="cpOKTxt">OK</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT OVERLAY -->
+<div id="aov">
+  <div class="aov-ic">&#128680;</div>
+  <div class="aov-ttl" id="aov-title">ALERT SENT!</div>
+  <div class="aov-msg" id="aovMsg">Alerts completed!</div>
+  <div class="aov-steps" id="aovSteps"></div>
+  <button class="aov-dis" onclick="dismissAlert()" id="ui-dismiss">&#10003; DISMISS</button>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="profilepage" class="screen inner-screen">
+  <div class="pg-hdr">
+    <button class="pg-bk" onclick="showScreen('home')">&#9664;</button>
+    <div class="pg-ttl">&#128100; PROFILE</div>
+  </div>
+  <div class="pg-body">
+    <div class="scard">
+      <div class="sc-ttl">&#128100; Personal Information</div>
+      <div class="fg">
+        <label class="flbl">Full Name</label>
+        <input class="finp" type="text" id="prName" placeholder="Your full name"/>
+      </div>
+      <div class="fg">
+        <label class="flbl">Father / Spouse Name</label>
+        <input class="finp" type="text" id="prFather" placeholder="Father or Spouse name"/>
+      </div>
+      <div class="fg">
+        <label class="flbl">Age</label>
+        <input class="finp" type="number" id="prAge" placeholder="Age" min="1" max="120"/>
+      </div>
+      <div class="fg">
+        <label class="flbl">Occupation</label>
+        <input class="finp" type="text" id="prOccupation" placeholder="Your occupation"/>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl">&#128241; Contact Details</div>
+      <div class="fg">
+        <label class="flbl">Phone Number</label>
+        <input class="finp" type="tel" id="prPhone" placeholder="+91XXXXXXXXXX"/>
+      </div>
+      <div class="fg">
+        <label class="flbl">Email Address</label>
+        <input class="finp" type="email" id="prEmail" placeholder="your@email.com"/>
+      </div>
+      <div>
+        <label class="flbl">Address</label>
+        <textarea class="finp" id="prAddress" placeholder="Your full address" rows="3"
+          style="resize:none;height:auto;line-height:1.5;min-height:80px"></textarea>
+      </div>
+    </div>
+    <div class="scard">
+      <div class="sc-ttl">&#127760; Social Media</div>
+      <div class="fg">
+        <label class="flbl"><span style="color:#1877F2;font-size:15px">&#9711;</span> Facebook Profile Link</label>
+        <input class="finp" type="url" id="prFacebook" placeholder="https://facebook.com/yourname"/>
+      </div>
+      <div class="fg">
+        <label class="flbl"><span style="color:#E1306C;font-size:15px">&#9711;</span> Instagram Profile Link</label>
+        <input class="finp" type="url" id="prInstagram" placeholder="https://instagram.com/yourname"/>
+      </div>
+      <div>
+        <label class="flbl"><span style="color:#FF0000;font-size:15px">&#9711;</span> YouTube Channel Link</label>
+        <input class="finp" type="url" id="prYoutube" placeholder="https://youtube.com/@yourchannel"/>
+      </div>
+    </div>
+    <div class="scard" id="profilePreviewCard" style="display:none">
+      <div class="sc-ttl">&#128203; Profile Card</div>
+      <div id="profilePreview" style="font-size:14px;color:var(--silver);line-height:2;font-weight:600"></div>
+    </div>
+    <button class="sv-btn" onclick="saveProfile()">&#128190; SAVE PROFILE</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ===================== LANGUAGE DATA ===================== */
+var LANG_DATA = {
+  en: {
+    subtitle:"Emergency Situation Alert",
+    q1:"Start Voice", q2:"Test Alert", q3:"Settings",
+    nav1:"Home", nav2:"Minimize", nav3:"Instant", nav4:"Contacts", nav5:"Profile",
+    settingsTitle:"SETTINGS", langTitle:"App Language",
+    nameTitle:"Your Name", nameLbl:"Name shown in alert",
+    previewTitle:"Alert Preview", save:"SAVE SETTINGS", dismiss:"DISMISS",
+    alertSent:"ALERT SENT!", alertMsg:"Processing alert...",
+    voiceOff:"Voice off", voiceOn:"Voice ON", gpsReady:"GPS ready", gpsOff:"GPS off",
+    saved:"Saved!", noContacts:"No contacts! Go to Contacts page.",
+    testMode:"TEST MODE",
+    vpTitle:"VOICE", vpTransTitle:"Live Transcript",
+    vpSetTitle:"Voice Settings", vpLangLbl:"Recognition Language",
+    vpPhraseLbl:"Activation Phrase",
+    vpHint:"Say this phrase to trigger confirmation popup",
+    vpStart:"START VOICE DETECTION", vpStop:"STOP VOICE DETECTION",
+    vpSave:"SAVE VOICE SETTINGS",
+    vpOff:"Voice Detection OFF", vpOn:"Listening... Say your phrase!",
+    cpTitle:"CONTACTS", cpCard:"Emergency Contacts", cpAdd:"Add Contact",
+    cpInfoTitle:"How Alerts Work",
+    cpInfo:"When EMERGENCY triggers:\n1 Confirm SMS sends to all contacts\n2 Confirm WhatsApp opens for all\n3 Confirm Call calls one by one\nVoice or tap OK/Cancel at each step",
+    cpSave:"SAVE CONTACTS",
+    bgRunning:"Active in background", langShort:"EN", langFlag:"GB",
+    confirmSMS:"Can I go ahead and send the SMS alert?",
+    confirmWA:"Can I go ahead and send the WhatsApp alert?",
+    confirmCall:"Can I proceed to call the saved numbers?",
+    confirmOK:"OK", confirmCancel:"Cancel",
+    simLabel:"SIM for SMS & Calls", waLabel:"WhatsApp Number",
+    callerLabel:"Caller SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / Call SIM Settings",
+    okWords:["ok","yes","send","go"],
+    cancelWords:["cancel","no","stop","skip"],
+    // SOS Settings
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"Phone number for SOS SMS",
+    sosSmsHint:"SOS button press - SMS alert will be sent to this number",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"Phone number for SOS WhatsApp",
+    sosWaHint:"SOS button press - WhatsApp alert will be sent to this number",
+    sosCallTtl:"Call Number", sosCallLbl:"Phone number to call during SOS",
+    sosCallHint:"SOS button press - direct call will be made to this number",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SIM for SMS & Calls",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"WhatsApp Number for SOS Alert",
+    sosWaSimHint:"Enter the WhatsApp registered number to use for SOS alerts",
+    sosSaveBtn:"SAVE SOS SETTINGS",
+    // Contact Settings
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"Select & drag to set send order. Selected contacts receive SMS alerts.",
+    csWaDesc:"Select & drag to set send order for WhatsApp alerts.",
+    csCallDesc:"Select & drag to set call order. Calls go one by one in this order.",
+    csSaveBtn:"SAVE SETTINGS",
+    // Account Settings
+    acctNameTtl:"Your Name", acctPreviewTtl:"Alert Preview",
+    acctPreviewNeeds:"needs HELP!", acctPreviewGps:"[GPS Location]",
+    acctPreviewTime:"[Auto timestamp]", acctPreviewRespond:"Please respond IMMEDIATELY!",
+    acctPwLbl:"Change Password", acctPwSub:"Update your app password",
+    acctPwCurLbl:"Current Password", acctPwNewLbl:"New Password", acctPwConfLbl:"Confirm New Password",
+    acctLogoutLbl:"Log Out", acctLogoutSub:"Clear session and restart",
+    acctSaveBtn:"SAVE SETTINGS",
+    // Menu drawer
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call numbers",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, language",
+    menuContactTtl:"Contact Settings", menuContactSub:"Select & order alert recipients",
+    menuAccountTtl:"Account Settings", menuAccountSub:"Name, password, app language",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp number, Call SIM",
+    // Default SIM settings page
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"Default SIM for sending SMS alerts",
+    simWaTtl:"WhatsApp Alert Number", simWaLbl:"Default WhatsApp number for alerts",
+    simWaHint:"Enter the WhatsApp registered number to use by default for all WhatsApp alerts",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Default SIM for making calls",
+    simSaveBtn:"SAVE SETTINGS",
+    // Test Alert Settings
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Numbers to receive test alerts",
+    testPgTtl:"TEST ALERT", testDesc:"Set the numbers that will receive alerts when the Test Alert button is tapped on the home screen.",
+    testSmsTtl:"SMS Test Number", testSmsLbl:"Phone number to receive test SMS",
+    testSmsHint:"Test SMS alert will be sent to this number",
+    testWaTtl:"WhatsApp Test Number", testWaLbl:"Phone number to receive test WhatsApp alert",
+    testWaHint:"Test WhatsApp alert will be sent to this number",
+    testCallTtl:"Call Test Number", testCallLbl:"Phone number to receive test call",
+    testCallHint:"Test call will be made to this number",
+    testSaveBtn:"SAVE TEST SETTINGS"
+  },
+  ta: {
+    subtitle:"அவசர சூழ்நிலை எச்சரிக்கை",
+    q1:"குரல் தொடங்கு", q2:"சோதனை", q3:"அமைப்பு",
+    nav1:"முகப்பு", nav2:"சிறுதாக்கு", nav3:"உடனடி", nav4:"தொடர்பு", nav5:"உள்நுழை",
+    settingsTitle:"அமைப்புகள்", langTitle:"பயன்பாட்டு மொழி",
+    nameTitle:"உங்கள் பெயர்", nameLbl:"எச்சரிக்கையில் பெயர்",
+    previewTitle:"எச்சரிக்கை முன்னோட்டம்", save:"சேமிக்கவும்", dismiss:"மூடவும்",
+    alertSent:"அவசரம் அனுப்பப்பட்டது!", alertMsg:"செயல்படுத்துகிறோம்...",
+    voiceOff:"குரல் அணைவு", voiceOn:"குரல் இயக்கம்", gpsReady:"GPS தயார்", gpsOff:"GPS இல்லை",
+    saved:"சேமிக்கப்பட்டது!", noContacts:"தொடர்பு இல்லை!",
+    testMode:"சோதனை பயன்முறை",
+    vpTitle:"குரல்", vpTransTitle:"நேரடி குரல்",
+    vpSetTitle:"குரல் அமைப்பு", vpLangLbl:"அங்கீகார மொழி",
+    vpPhraseLbl:"செயல்படுத்தும் வார்த்தை",
+    vpHint:"இந்த வார்த்தையை சொன்னால் உறுதிப்படுத்தல் popup தோன்றும்",
+    vpStart:"குரல் கண்டறிதல் தொடங்கு", vpStop:"குரல் நிறுத்து",
+    vpSave:"குரல் அமைப்பு சேமிக்கவும்",
+    vpOff:"குரல் கண்டறிதல் அணைவு", vpOn:"குரல் கேட்கிறது...",
+    cpTitle:"தொடர்புகள்", cpCard:"அவசர தொடர்புகள்", cpAdd:"தொடர்பு சேர்க்கவும்",
+    cpInfoTitle:"எப்படி செயல்படும்",
+    cpInfo:"அவசரம் இயங்கும்போது:\n1 SMS உறுதிப்படுத்தல்\n2 WhatsApp உறுதிப்படுத்தல்\n3 அழைப்பு உறுதிப்படுத்தல்\nகுரல் மூலம் சரி/வேண்டாம்",
+    cpSave:"தொடர்புகள் சேமிக்கவும்",
+    bgRunning:"பின்னணியில் இயங்குகிறது", langShort:"TA", langFlag:"IN",
+    confirmSMS:"நான் SMS அலர்ட் அனுப்பட்டுமா?",
+    confirmWA:"நான் WhatsApp அலர்ட் அனுப்பட்டுமா?",
+    confirmCall:"பதிவு பண்ணின எண்களுக்கு நான் call பண்ண ஆரம்பிக்கட்டுமா?",
+    confirmOK:"சரி", confirmCancel:"வேண்டாம்",
+    simLabel:"எத்தனை SIM?", waLabel:"WhatsApp எண்",
+    callerLabel:"அழைப்பு SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / அழைப்பு SIM அமைப்பு",
+    okWords:["சரி","ok","yes","send","அனுப்பு"],
+    cancelWords:["வேண்டாம்","cancel","no","stop","வேண்டா"],
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"SOS SMS-க்கான தொலைபேசி எண்",
+    sosSmsHint:"SOS button அழுத்தும்போது - இந்த எண்ணுக்கு SMS alert போகும்",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"SOS WhatsApp-க்கான தொலைபேசி எண்",
+    sosWaHint:"SOS button அழுத்தும்போது - இந்த எண்ணுக்கு WhatsApp alert போகும்",
+    sosCallTtl:"Call Number", sosCallLbl:"SOS call-க்கான தொலைபேசி எண்",
+    sosCallHint:"SOS button அழுத்தும்போது - இந்த எண்ணுக்கு நேரடி call போகும்",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SMS & Calls-க்கான SIM",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"SOS Alert-க்கான WhatsApp எண்",
+    sosWaSimHint:"SOS alerts-க்கு பயன்படுத்த WhatsApp-ல் பதிவான எண்ணை உள்ளிடுக",
+    sosSaveBtn:"SOS SETTINGS சேமிக்கவும்",
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"SMS alerts பெறுவோரை தேர்ந்தெடுத்து வரிசைப்படுத்துக.",
+    csWaDesc:"WhatsApp alerts-க்கு தேர்ந்தெடுத்து வரிசைப்படுத்துக.",
+    csCallDesc:"Call வரிசையை அமைக்க இழுத்து வரிசைப்படுத்துக.",
+    csSaveBtn:"SETTINGS சேமிக்கவும்",
+    acctNameTtl:"உங்கள் பெயர்", acctPreviewTtl:"Alert முன்னோட்டம்",
+    acctPreviewNeeds:"உடனடி உதவி தேவை!", acctPreviewGps:"[GPS இருப்பிடம்]",
+    acctPreviewTime:"[நேரம்]", acctPreviewRespond:"உடனே பதில் அனுப்புங்கள்!",
+    acctPwLbl:"கடவுச்சொல் மாற்றுக", acctPwSub:"App கடவுச்சொல்லை புதுப்பிக்கவும்",
+    acctPwCurLbl:"தற்போதைய கடவுச்சொல்", acctPwNewLbl:"புதிய கடவுச்சொல்", acctPwConfLbl:"கடவுச்சொல் உறுதிப்படுத்துக",
+    acctLogoutLbl:"வெளியேறு", acctLogoutSub:"Session முடித்து மறுதொடக்கம்",
+    acctSaveBtn:"SETTINGS சேமிக்கவும்",
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call எண்கள்",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, மொழி",
+    menuContactTtl:"Contact Settings", menuContactSub:"Alert பெறுவோரை தேர்வு செய்",
+    menuAccountTtl:"Account Settings", menuAccountSub:"பெயர், கடவுச்சொல், மொழி",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp எண், Call SIM",
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"SMS alerts-க்கான default SIM",
+    simWaTtl:"WhatsApp Alert எண்", simWaLbl:"Alerts-க்கான default WhatsApp எண்",
+    simWaHint:"எல்லா WhatsApp alerts-க்கும் default-ஆக பயன்படுத்த WhatsApp எண்ணை உள்ளிடுக",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Calls-க்கான default SIM",
+    simSaveBtn:"SETTINGS சேமிக்கவும்",
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Test alerts பெறுவதற்கான எண்கள்",
+    testPgTtl:"TEST ALERT", testDesc:"Home screen-ல் Test Alert button அழுத்தும்போது, இந்த எண்களுக்கு test alert அனுப்பப்படும்.",
+    testSmsTtl:"SMS Test எண்", testSmsLbl:"Test SMS பெறும் தொலைபேசி எண்",
+    testSmsHint:"Test SMS alert இந்த எண்ணுக்கு அனுப்பப்படும்",
+    testWaTtl:"WhatsApp Test எண்", testWaLbl:"Test WhatsApp alert பெறும் தொலைபேசி எண்",
+    testWaHint:"Test WhatsApp alert இந்த எண்ணுக்கு அனுப்பப்படும்",
+    testCallTtl:"Call Test எண்", testCallLbl:"Test call பெறும் தொலைபேசி எண்",
+    testCallHint:"Test call இந்த எண்ணுக்கு செய்யப்படும்",
+    testSaveBtn:"TEST SETTINGS சேமிக்கவும்"
+  },
+  ml: {
+    subtitle:"അടിയന്തര സ്ഥിതി മുന്നറിയിപ്പ്",
+    q1:"ശബ്ദം തുടങ്ങുക", q2:"ടെസ്റ്റ്", q3:"ക്രമീകരണം",
+    nav1:"ഹോം", nav2:"ചുരുക്കുക", nav3:"ഉടനെ", nav4:"കോൺടാക്റ്റ്", nav5:"ലോഗിൻ",
+    settingsTitle:"ക്രമീകരണം", langTitle:"ഭാഷ",
+    nameTitle:"പേര്", nameLbl:"അലർട്ടിൽ പേര്",
+    previewTitle:"പ്രിവ്യൂ", save:"സേവ്", dismiss:"അട",
+    alertSent:"അലർട്ട് അയച്ചു!", alertMsg:"പ്രോസസ് ചെയ്യുന്നു...",
+    voiceOff:"ശബ്ദം OFF", voiceOn:"ശബ്ദം ON", gpsReady:"GPS തയ്യാർ", gpsOff:"GPS ഇല്ല",
+    saved:"സേവ് ചെയ്തു!", noContacts:"കോൺടാക്റ്റ് ഇല്ല!",
+    testMode:"ടെസ്റ്റ്",
+    vpTitle:"ശബ്ദം", vpTransTitle:"തത്സമയ ശബ്ദം",
+    vpSetTitle:"ശബ്ദ ക്രമീകരണം", vpLangLbl:"ഭാഷ",
+    vpPhraseLbl:"ആക്ടിവേഷൻ വാക്ക്",
+    vpHint:"ഈ വാക്ക് പറഞ്ഞാൽ സ്ഥിരീകരണ popup വരും",
+    vpStart:"ശബ്ദം ആരംഭിക്കുക", vpStop:"ശബ്ദം നിർത്തുക",
+    vpSave:"ശബ്ദ ക്രമീകരണം സേവ്",
+    vpOff:"ശബ്ദ തിരിച്ചറിയൽ OFF", vpOn:"ശബ്ദം കേൾക്കുന്നു...",
+    cpTitle:"കോൺടാക്റ്റ്", cpCard:"അടിയന്തര കോൺടാക്റ്റ്", cpAdd:"കോൺടാക്റ്റ് ചേർക്കുക",
+    cpInfoTitle:"എങ്ങനെ പ്രവർത്തിക്കുന്നു",
+    cpInfo:"EMERGENCY ട്രിഗർ ആകുമ്പോൾ:\n1 SMS സ്ഥിരീകരണം\n2 WhatsApp സ്ഥിരീകരണം\n3 വിളി സ്ഥിരീകരണം\nശബ്ദം/ടാപ്പ് OK/വേണ്ട",
+    cpSave:"സേവ്",
+    bgRunning:"പിന്നിൽ പ്രവർത്തിക്കുന്നു", langShort:"ML", langFlag:"IN",
+    confirmSMS:"SMS അലർട്ട് അയക്കട്ടോ?",
+    confirmWA:"WhatsApp അലർട്ട് അയക്കട്ടോ?",
+    confirmCall:"സേവ് ചെയ്ത നമ്പറുകളിലേക്ക് വിളിക്കാമോ?",
+    confirmOK:"സമ്മതം", confirmCancel:"വേണ്ട",
+    simLabel:"ഏത് SIM?", waLabel:"WhatsApp നമ്പർ",
+    callerLabel:"വിളി SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / വിളി SIM",
+    okWords:["സമ്മതം","ok","yes","send","ആം"],
+    cancelWords:["വേണ്ട","cancel","no","stop"],
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"SOS SMS-നുള്ള ഫോൺ നമ്പർ",
+    sosSmsHint:"SOS button അമർത്തുമ്പോൾ - ഈ നമ്പറിലേക്ക് SMS alert പോകും",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"SOS WhatsApp-നുള്ള ഫോൺ നമ്പർ",
+    sosWaHint:"SOS button അമർത്തുമ്പോൾ - ഈ നമ്പറിലേക്ക് WhatsApp alert പോകും",
+    sosCallTtl:"Call Number", sosCallLbl:"SOS call-നുള്ള ഫോൺ നമ്പർ",
+    sosCallHint:"SOS button അമർത്തുമ്പോൾ - ഈ നമ്പറിലേക്ക് നേരിട്ട് call പോകും",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SMS & Calls-നുള്ള SIM",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"SOS Alert-നുള്ള WhatsApp നമ്പർ",
+    sosWaSimHint:"SOS alerts-ന് ഉപയോഗിക്കാൻ WhatsApp-ൽ രജിസ്റ്റർ ചെയ്ത നമ്പർ നൽകുക",
+    sosSaveBtn:"SOS SETTINGS സേവ്",
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"SMS alerts ലഭിക്കുന്നവരെ തിരഞ്ഞെടുത്ത് ക്രമീകരിക്കുക.",
+    csWaDesc:"WhatsApp alerts-ന് തിരഞ്ഞെടുത്ത് ക്രമീകരിക്കുക.",
+    csCallDesc:"Call ക്രമം സജ്ജമാക്കാൻ വലിച്ചിടുക.",
+    csSaveBtn:"SETTINGS സേവ്",
+    acctNameTtl:"പേര്", acctPreviewTtl:"Alert പ്രിവ്യൂ",
+    acctPreviewNeeds:"ഉടനടി സഹായം ആവശ്യമാണ്!", acctPreviewGps:"[GPS സ്ഥാനം]",
+    acctPreviewTime:"[സമയം]", acctPreviewRespond:"ഉടൻ മറുപടി അയക്കുക!",
+    acctPwLbl:"പാസ്‌വേഡ് മാറ്റുക", acctPwSub:"App പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക",
+    acctPwCurLbl:"നിലവിലെ പാസ്‌വേഡ്", acctPwNewLbl:"പുതിയ പാസ്‌വേഡ്", acctPwConfLbl:"പാസ്‌വേഡ് സ്ഥിരീകരിക്കുക",
+    acctLogoutLbl:"പുറത്തുകടക്കുക", acctLogoutSub:"Session ക്ലിയർ ചെയ്ത് പുനരാരംഭിക്കുക",
+    acctSaveBtn:"SETTINGS സേവ്",
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call നമ്പറുകൾ",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, ഭാഷ",
+    menuContactTtl:"Contact Settings", menuContactSub:"Alert ലഭിക്കുന്നവരെ തിരഞ്ഞെടുക്കുക",
+    menuAccountTtl:"Account Settings", menuAccountSub:"പേര്, പാസ്‌വേഡ്, ഭാഷ",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp നമ്പർ, Call SIM",
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"SMS alerts-നുള്ള default SIM",
+    simWaTtl:"WhatsApp Alert നമ്പർ", simWaLbl:"Alerts-നുള്ള default WhatsApp നമ്പർ",
+    simWaHint:"എല്ലാ WhatsApp alerts-നും default ആയി ഉപയോഗിക്കാൻ WhatsApp നമ്പർ നൽകുക",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Calls-നുള്ള default SIM",
+    simSaveBtn:"SETTINGS സേവ്",
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Test alerts ലഭിക്കുന്ന നമ്പറുകൾ",
+    testPgTtl:"TEST ALERT", testDesc:"Home screen-ൽ Test Alert button അമർത്തുമ്പോൾ ഈ നമ്പറുകളിലേക്ക് test alert അയക്കും.",
+    testSmsTtl:"SMS Test നമ്പർ", testSmsLbl:"Test SMS ലഭിക്കുന്ന ഫോൺ നമ്പർ",
+    testSmsHint:"Test SMS alert ഈ നമ്പറിലേക്ക് അയക്കും",
+    testWaTtl:"WhatsApp Test നമ്പർ", testWaLbl:"Test WhatsApp alert ലഭിക്കുന്ന ഫോൺ നമ്പർ",
+    testWaHint:"Test WhatsApp alert ഈ നമ്പറിലേക്ക് അയക്കും",
+    testCallTtl:"Call Test നമ്പർ", testCallLbl:"Test call ലഭിക്കുന്ന ഫോൺ നമ്പർ",
+    testCallHint:"Test call ഈ നമ്പറിലേക്ക് ചെയ്യും",
+    testSaveBtn:"TEST SETTINGS സേവ്"
+  },
+  hi: {
+    subtitle:"आपातकालीन स्थिति अलर्ट",
+    q1:"आवाज़ शुरू", q2:"टेस्ट", q3:"सेटिंग्स",
+    nav1:"होम", nav2:"छोटा करें", nav3:"तत्काल", nav4:"संपर्क", nav5:"प्रोफ़ाइल",
+    settingsTitle:"सेटिंग्स", langTitle:"भाषा",
+    nameTitle:"आपका नाम", nameLbl:"अलर्ट में नाम",
+    previewTitle:"अलर्ट पूर्वावलोकन", save:"सेव करें", dismiss:"बंद",
+    alertSent:"अलर्ट भेजा!", alertMsg:"प्रोसेस हो रहा है...",
+    voiceOff:"आवाज़ बंद", voiceOn:"आवाज़ चालू", gpsReady:"GPS तैयार", gpsOff:"GPS बंद",
+    saved:"सेव हो गया!", noContacts:"कोई संपर्क नहीं!",
+    testMode:"टेस्ट मोड",
+    vpTitle:"आवाज़", vpTransTitle:"लाइव",
+    vpSetTitle:"आवाज़ सेटिंग", vpLangLbl:"भाषा",
+    vpPhraseLbl:"वाक्यांश",
+    vpHint:"बोलने पर पुष्टि पॉपअप आएगा",
+    vpStart:"आवाज़ शुरू", vpStop:"आवाज़ बंद",
+    vpSave:"आवाज़ सेव",
+    vpOff:"आवाज़ OFF", vpOn:"आवाज़ सुन रहा है...",
+    cpTitle:"संपर्क", cpCard:"आपातकालीन संपर्क", cpAdd:"संपर्क जोड़ें",
+    cpInfoTitle:"अलर्ट कैसे काम करता है",
+    cpInfo:"ट्रिगर होने पर:\n1 SMS पुष्टि करें\n2 WhatsApp पुष्टि करें\n3 कॉल पुष्टि करें\nआवाज़/टैप OK/नहीं",
+    cpSave:"संपर्क सेव",
+    bgRunning:"पृष्ठभूमि में चल रहा है", langShort:"HI", langFlag:"IN",
+    confirmSMS:"क्या मैं SMS अलर्ट भेजूं?",
+    confirmWA:"क्या मैं WhatsApp अलर्ट भेजूं?",
+    confirmCall:"क्या मैं सभी नंबरों पर कॉल करूं?",
+    confirmOK:"हाँ", confirmCancel:"नहीं",
+    simLabel:"कौनसा SIM?", waLabel:"WhatsApp नंबर",
+    callerLabel:"कॉलर SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / कॉल SIM",
+    okWords:["हाँ","ok","yes","send","भेजो"],
+    cancelWords:["नहीं","cancel","no","stop","रुको"],
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"SOS SMS के लिए फ़ोन नंबर",
+    sosSmsHint:"SOS बटन दबाने पर - इस नंबर पर SMS alert भेजा जाएगा",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"SOS WhatsApp के लिए फ़ोन नंबर",
+    sosWaHint:"SOS बटन दबाने पर - इस नंबर पर WhatsApp alert भेजा जाएगा",
+    sosCallTtl:"Call Number", sosCallLbl:"SOS कॉल के लिए फ़ोन नंबर",
+    sosCallHint:"SOS बटन दबाने पर - इस नंबर पर सीधे कॉल किया जाएगा",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SMS & Calls के लिए SIM",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"SOS Alert के लिए WhatsApp नंबर",
+    sosWaSimHint:"SOS alerts के लिए WhatsApp पर पंजीकृत नंबर दर्ज करें",
+    sosSaveBtn:"SOS SETTINGS सेव करें",
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"SMS alerts प्राप्त करने वालों को चुनें और क्रम तय करें।",
+    csWaDesc:"WhatsApp alerts के लिए चुनें और क्रम तय करें।",
+    csCallDesc:"कॉल क्रम तय करने के लिए खींचें।",
+    csSaveBtn:"SETTINGS सेव करें",
+    acctNameTtl:"आपका नाम", acctPreviewTtl:"Alert पूर्वावलोकन",
+    acctPreviewNeeds:"को तत्काल सहायता चाहिए!", acctPreviewGps:"[GPS स्थान]",
+    acctPreviewTime:"[समय]", acctPreviewRespond:"कृपया तुरंत प्रतिक्रिया दें!",
+    acctPwLbl:"पासवर्ड बदलें", acctPwSub:"App पासवर्ड अपडेट करें",
+    acctPwCurLbl:"वर्तमान पासवर्ड", acctPwNewLbl:"नया पासवर्ड", acctPwConfLbl:"पासवर्ड की पुष्टि करें",
+    acctLogoutLbl:"लॉग आउट", acctLogoutSub:"Session हटाएं और पुनः आरंभ करें",
+    acctSaveBtn:"SETTINGS सेव करें",
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call नंबर",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, भाषा",
+    menuContactTtl:"Contact Settings", menuContactSub:"Alert प्राप्तकर्ता चुनें",
+    menuAccountTtl:"Account Settings", menuAccountSub:"नाम, पासवर्ड, भाषा",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp नंबर, Call SIM",
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"SMS alerts के लिए default SIM",
+    simWaTtl:"WhatsApp Alert नंबर", simWaLbl:"Alerts के लिए default WhatsApp नंबर",
+    simWaHint:"सभी WhatsApp alerts के लिए default WhatsApp नंबर दर्ज करें",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Calls के लिए default SIM",
+    simSaveBtn:"SETTINGS सेव करें",
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Test alerts प्राप्त करने वाले नंबर",
+    testPgTtl:"TEST ALERT", testDesc:"Home screen पर Test Alert button दबाने पर इन नंबरों पर test alert भेजा जाएगा।",
+    testSmsTtl:"SMS Test नंबर", testSmsLbl:"Test SMS प्राप्त करने वाला फ़ोन नंबर",
+    testSmsHint:"Test SMS alert इस नंबर पर भेजा जाएगा",
+    testWaTtl:"WhatsApp Test नंबर", testWaLbl:"Test WhatsApp alert प्राप्त करने वाला फ़ोन नंबर",
+    testWaHint:"Test WhatsApp alert इस नंबर पर भेजा जाएगा",
+    testCallTtl:"Call Test नंबर", testCallLbl:"Test call प्राप्त करने वाला फ़ोन नंबर",
+    testCallHint:"Test call इस नंबर पर किया जाएगा",
+    testSaveBtn:"TEST SETTINGS सेव करें"
+  },
+  te: {
+    subtitle:"అత్యవసర పరిస్థితి హెచ్చరిక",
+    q1:"వాయిస్ ప్రారంభించు", q2:"టెస్ట్", q3:"సెట్టింగ్స్",
+    nav1:"హోమ్", nav2:"చిక్కుగా చేయి", nav3:"వెంటనే", nav4:"కాంటాక్ట్స్", nav5:"ప్రొఫైల్",
+    settingsTitle:"సెట్టింగ్స్", langTitle:"భాష",
+    nameTitle:"మీ పేరు", nameLbl:"హెచ్చరికలో పేరు",
+    previewTitle:"ప్రివ్యూ", save:"సేవ్", dismiss:"మూసి",
+    alertSent:"అలర్ట్ పంపించాం!", alertMsg:"ప్రాసెస్ చేస్తున్నాం...",
+    voiceOff:"వాయిస్ OFF", voiceOn:"వాయిస్ ON", gpsReady:"GPS సిద్ధం", gpsOff:"GPS లేదు",
+    saved:"సేవ్ అయింది!", noContacts:"కాంటాక్ట్స్ లేవు!",
+    testMode:"టెస్ట్ మోడ్",
+    vpTitle:"వాయిస్", vpTransTitle:"లైవ్",
+    vpSetTitle:"వాయిస్ సెట్టింగ్స్", vpLangLbl:"భాష",
+    vpPhraseLbl:"పదం",
+    vpHint:"ఈ పదం చెబితే నిర్ధారణ popup వస్తుంది",
+    vpStart:"వాయిస్ స్టార్ట్", vpStop:"వాయిస్ ఆపు",
+    vpSave:"వాయిస్ సేవ్",
+    vpOff:"వాయిస్ OFF", vpOn:"వాయిస్ వింటున్నది...",
+    cpTitle:"కాంటాక్ట్స్", cpCard:"అత్యవసర కాంటాక్ట్స్", cpAdd:"కాంటాక్ట్ చేర్చు",
+    cpInfoTitle:"అలర్ట్ ఎలా పని చేస్తుంది",
+    cpInfo:"ట్రిగ్గర్ అయినప్పుడు:\n1 SMS నిర్ధారణ\n2 WhatsApp నిర్ధారణ\n3 కాల్ నిర్ధారణ\nవాయిస్/టాప్ OK/వద్దు",
+    cpSave:"సేవ్",
+    bgRunning:"నేపథ్యంలో నడుస్తున్నది", langShort:"TE", langFlag:"IN",
+    confirmSMS:"నేను SMS అలర్ట్ పంపించనా?",
+    confirmWA:"నేను WhatsApp అలర్ట్ పంపించనా?",
+    confirmCall:"సేవ్ చేసిన నంబర్లకు కాల్ చేయనా?",
+    confirmOK:"అవును", confirmCancel:"వద్దు",
+    simLabel:"ఏ SIM?", waLabel:"WhatsApp నంబర్",
+    callerLabel:"కాల్ SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / కాల్ SIM",
+    okWords:["అవును","ok","yes","send","పంపు"],
+    cancelWords:["వద్దు","cancel","no","stop"],
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"SOS SMS కోసం ఫోన్ నంబర్",
+    sosSmsHint:"SOS button నొక్కినప్పుడు - ఈ నంబర్‌కు SMS alert వెళ్ళుతుంది",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"SOS WhatsApp కోసం ఫోన్ నంబర్",
+    sosWaHint:"SOS button నొక్కినప్పుడు - ఈ నంబర్‌కు WhatsApp alert వెళ్ళుతుంది",
+    sosCallTtl:"Call Number", sosCallLbl:"SOS call కోసం ఫోన్ నంబర్",
+    sosCallHint:"SOS button నొక్కినప్పుడు - ఈ నంబర్‌కు నేరుగా call వెళ్ళుతుంది",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SMS & Calls కోసం SIM",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"SOS Alert కోసం WhatsApp నంబర్",
+    sosWaSimHint:"SOS alerts కోసం WhatsApp లో నమోదైన నంబర్ నమోదు చేయండి",
+    sosSaveBtn:"SOS SETTINGS సేవ్",
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"SMS alerts అందుకునేవారిని ఎంచుకుని క్రమాన్ని సెట్ చేయండి.",
+    csWaDesc:"WhatsApp alerts కోసం ఎంచుకుని క్రమాన్ని సెట్ చేయండి.",
+    csCallDesc:"Call క్రమాన్ని సెట్ చేయడానికి లాగండి.",
+    csSaveBtn:"SETTINGS సేవ్",
+    acctNameTtl:"మీ పేరు", acctPreviewTtl:"Alert ప్రివ్యూ",
+    acctPreviewNeeds:"కు తక్షణ సహాయం అవసరం!", acctPreviewGps:"[GPS స్థానం]",
+    acctPreviewTime:"[సమయం]", acctPreviewRespond:"దయచేసి వెంటనే స్పందించండి!",
+    acctPwLbl:"పాస్‌వర్డ్ మార్చు", acctPwSub:"App పాస్‌వర్డ్ అప్‌డేట్ చేయండి",
+    acctPwCurLbl:"ప్రస్తుత పాస్‌వర్డ్", acctPwNewLbl:"కొత్త పాస్‌వర్డ్", acctPwConfLbl:"పాస్‌వర్డ్ నిర్ధారించు",
+    acctLogoutLbl:"లాగ్ అవుట్", acctLogoutSub:"Session క్లియర్ చేసి పునఃప్రారంభించు",
+    acctSaveBtn:"SETTINGS సేవ్",
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call నంబర్లు",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, భాష",
+    menuContactTtl:"Contact Settings", menuContactSub:"Alert అందుకునేవారిని ఎంచుకో",
+    menuAccountTtl:"Account Settings", menuAccountSub:"పేరు, పాస్‌వర్డ్, భాష",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp నంబర్, Call SIM",
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"SMS alerts కోసం default SIM",
+    simWaTtl:"WhatsApp Alert నంబర్", simWaLbl:"Alerts కోసం default WhatsApp నంబర్",
+    simWaHint:"అన్ని WhatsApp alerts కోసం default WhatsApp నంబర్ నమోదు చేయండి",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Calls కోసం default SIM",
+    simSaveBtn:"SETTINGS సేవ్",
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Test alerts అందుకునే నంబర్లు",
+    testPgTtl:"TEST ALERT", testDesc:"Home screen లో Test Alert button నొక్కినప్పుడు ఈ నంబర్లకు test alert పంపబడుతుంది.",
+    testSmsTtl:"SMS Test నంబర్", testSmsLbl:"Test SMS అందుకునే ఫోన్ నంబర్",
+    testSmsHint:"Test SMS alert ఈ నంబర్‌కు పంపబడుతుంది",
+    testWaTtl:"WhatsApp Test నంబర్", testWaLbl:"Test WhatsApp alert అందుకునే ఫోన్ నంబర్",
+    testWaHint:"Test WhatsApp alert ఈ నంబర్‌కు పంపబడుతుంది",
+    testCallTtl:"Call Test నంబర్", testCallLbl:"Test call అందుకునే ఫోన్ నంబర్",
+    testCallHint:"Test call ఈ నంబర్‌కు చేయబడుతుంది",
+    testSaveBtn:"TEST SETTINGS సేవ్"
+  },
+  kn: {
+    subtitle:"ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಎಚ್ಚರಿಕೆ",
+    q1:"ವಾಯ್ಸ್ ಪ್ರಾರಂಭಿಸಿ", q2:"ಪರೀಕ್ಷೆ", q3:"ಸೆಟ್ಟಿಂಗ್ಸ್",
+    nav1:"ಮನೆ", nav2:"ಚಿಕ್ಕಗೊಳಿಸಿ", nav3:"ತಕ್ಷಣ", nav4:"ಸಂಪರ್ಕ", nav5:"ಪ್ರೊಫೈಲ್",
+    settingsTitle:"ಸೆಟ್ಟಿಂಗ್ಸ್", langTitle:"ಭಾಷೆ",
+    nameTitle:"ನಿಮ್ಮ ಹೆಸರು", nameLbl:"ಎಚ್ಚರಿಕೆಯಲ್ಲಿ ಹೆಸರು",
+    previewTitle:"ಪ್ರಿವ್ಯೂ", save:"ಉಳಿಸಿ", dismiss:"ಮುಚ್ಚಿ",
+    alertSent:"ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸಲಾಗಿದೆ!", alertMsg:"ಪ್ರಕ್ರಿಯೆ ನಡೆಯುತ್ತಿದೆ...",
+    voiceOff:"ಧ್ವನಿ OFF", voiceOn:"ಧ್ವನಿ ON", gpsReady:"GPS ಸಿದ್ಧ", gpsOff:"GPS ಇಲ್ಲ",
+    saved:"ಉಳಿಸಲಾಗಿದೆ!", noContacts:"ಸಂಪರ್ಕ ಇಲ್ಲ!",
+    testMode:"ಪರೀಕ್ಷೆ",
+    vpTitle:"ಧ್ವನಿ", vpTransTitle:"ಲೈವ್",
+    vpSetTitle:"ಧ್ವನಿ ಸೆಟ್ಟಿಂಗ್", vpLangLbl:"ಭಾಷೆ",
+    vpPhraseLbl:"ಪದ",
+    vpHint:"ಈ ಪದ ಹೇಳಿದರೆ ದೃಢೀಕರಣ popup ಬರುತ್ತದೆ",
+    vpStart:"ಧ್ವನಿ ಪ್ರಾರಂಭಿಸಿ", vpStop:"ಧ್ವನಿ ನಿಲ್ಲಿಸಿ",
+    vpSave:"ಧ್ವನಿ ಉಳಿಸಿ",
+    vpOff:"ಧ್ವನಿ OFF", vpOn:"ಧ್ವನಿ ಕೇಳುತ್ತಿದೆ...",
+    cpTitle:"ಸಂಪರ್ಕ", cpCard:"ತುರ್ತು ಸಂಪರ್ಕ", cpAdd:"ಸಂಪರ್ಕ ಸೇರಿಸಿ",
+    cpInfoTitle:"ಎಚ್ಚರಿಕೆ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+    cpInfo:"ಟ್ರಿಗರ್ ಆದಾಗ:\n1 SMS ದೃಢೀಕರಣ\n2 WhatsApp ದೃಢೀಕರಣ\n3 ಕರೆ ದೃಢೀಕರಣ\nಧ್ವನಿ/ಟ್ಯಾಪ್ OK/ಬೇಡ",
+    cpSave:"ಉಳಿಸಿ",
+    bgRunning:"ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಚಾಲು", langShort:"KN", langFlag:"IN",
+    confirmSMS:"ನಾನು SMS ಅಲರ್ಟ್ ಕಳಿಸಲಾ?",
+    confirmWA:"ನಾನು WhatsApp ಅಲರ್ಟ್ ಕಳಿಸಲಾ?",
+    confirmCall:"ಸೇವ್ ಮಾಡಿದ ನಂಬರ್ ಗಳಿಗೆ ಕರೆ ಮಾಡಲಾ?",
+    confirmOK:"ಹೌದು", confirmCancel:"ಬೇಡ",
+    simLabel:"ಯಾವ SIM?", waLabel:"WhatsApp ನಂಬರ್",
+    callerLabel:"ಕರೆ SIM", sim1:"SIM 1", sim2:"SIM 2",
+    settingsSIM:"SMS / ಕರೆ SIM",
+    okWords:["ಹೌದು","ok","yes","send","ಕಳಿಸು"],
+    cancelWords:["ಬೇಡ","cancel","no","stop"],
+    sosSmsNumTtl:"SMS Alert Number", sosSmsNumLbl:"SOS SMS ಗಾಗಿ ಫೋನ್ ನಂಬರ್",
+    sosSmsHint:"SOS button ಒತ್ತಿದಾಗ - ಈ ನಂಬರ್‌ಗೆ SMS alert ಹೋಗುತ್ತದೆ",
+    sosWaTtl:"WhatsApp Alert Number", sosWaLbl:"SOS WhatsApp ಗಾಗಿ ಫೋನ್ ನಂಬರ್",
+    sosWaHint:"SOS button ಒತ್ತಿದಾಗ - ಈ ನಂಬರ್‌ಗೆ WhatsApp alert ಹೋಗುತ್ತದೆ",
+    sosCallTtl:"Call Number", sosCallLbl:"SOS call ಗಾಗಿ ಫೋನ್ ನಂಬರ್",
+    sosCallHint:"SOS button ಒತ್ತಿದಾಗ - ಈ ನಂಬರ್‌ಗೆ ನೇರವಾಗಿ call ಹೋಗುತ್ತದೆ",
+    sosSimTtl:"SMS SIM Settings", sosSimLbl:"SMS & Calls ಗಾಗಿ SIM",
+    sosCallerLbl:"Caller SIM",
+    sosWaSimLbl:"SOS Alert ಗಾಗಿ WhatsApp ನಂಬರ್",
+    sosWaSimHint:"SOS alerts ಗಾಗಿ WhatsApp ನಲ್ಲಿ ನೋಂದಾಯಿಸಿದ ನಂಬರ್ ನಮೂದಿಸಿ",
+    sosSaveBtn:"SOS SETTINGS ಉಳಿಸಿ",
+    csSmsSecTtl:"SMS Alert", csWaSecTtl:"WhatsApp Alert", csCallSecTtl:"Phone Call Alert",
+    csSmsDesc:"SMS alerts ಸ್ವೀಕರಿಸುವವರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಕ್ರಮ ಹೊಂದಿಸಿ.",
+    csWaDesc:"WhatsApp alerts ಗಾಗಿ ಆಯ್ಕೆ ಮಾಡಿ ಕ್ರಮ ಹೊಂದಿಸಿ.",
+    csCallDesc:"Call ಕ್ರಮ ಹೊಂದಿಸಲು ಎಳೆಯಿರಿ.",
+    csSaveBtn:"SETTINGS ಉಳಿಸಿ",
+    acctNameTtl:"ನಿಮ್ಮ ಹೆಸರು", acctPreviewTtl:"Alert ಪ್ರಿವ್ಯೂ",
+    acctPreviewNeeds:"ಗೆ ತಕ್ಷಣ ಸಹಾಯ ಬೇಕು!", acctPreviewGps:"[GPS ಸ್ಥಳ]",
+    acctPreviewTime:"[ಸಮಯ]", acctPreviewRespond:"ದಯವಿಟ್ಟು ತಕ್ಷಣ ಪ್ರತಿಕ್ರಿಯಿಸಿ!",
+    acctPwLbl:"ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ", acctPwSub:"App ಪಾಸ್‌ವರ್ಡ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ",
+    acctPwCurLbl:"ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್", acctPwNewLbl:"ಹೊಸ ಪಾಸ್‌ವರ್ಡ್", acctPwConfLbl:"ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ",
+    acctLogoutLbl:"ಲಾಗ್ ಔಟ್", acctLogoutSub:"Session ಅಳಿಸಿ ಮರುಪ್ರಾರಂಭಿಸಿ",
+    acctSaveBtn:"SETTINGS ಉಳಿಸಿ",
+    menuSosTtl:"SOS Settings", menuSosSub:"SMS, WhatsApp & Call ನಂಬರ್‌ಗಳು",
+    menuVoiceTtl:"Voice Settings", menuVoiceSub:"Detection phrase, ಭಾಷೆ",
+    menuContactTtl:"Contact Settings", menuContactSub:"Alert ಸ್ವೀಕರಿಸುವವರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ",
+    menuAccountTtl:"Account Settings", menuAccountSub:"ಹೆಸರು, ಪಾಸ್‌ವರ್ಡ್, ಭಾಷೆ",
+    menuSimTtl:"Default SIM & WhatsApp Settings", menuSimSub:"SMS SIM, WhatsApp ನಂಬರ್, Call SIM",
+    simPgTtl:"SIM SETTINGS",
+    simSmsTtl:"SMS Alert SIM", simSmsLbl:"SMS alerts ಗಾಗಿ default SIM",
+    simWaTtl:"WhatsApp Alert ನಂಬರ್", simWaLbl:"Alerts ಗಾಗಿ default WhatsApp ನಂಬರ್",
+    simWaHint:"ಎಲ್ಲಾ WhatsApp alerts ಗಾಗಿ default WhatsApp ನಂಬರ್ ನಮೂದಿಸಿ",
+    simCallTtl:"Phone Call SIM", simCallLbl:"Calls ಗಾಗಿ default SIM",
+    simSaveBtn:"SETTINGS ಉಳಿಸಿ",
+    menuTestTtl:"Test Alert Settings", menuTestSub:"Test alerts ಸ್ವೀಕರಿಸುವ ನಂಬರ್‌ಗಳು",
+    testPgTtl:"TEST ALERT", testDesc:"Home screen ನಲ್ಲಿ Test Alert button ಒತ್ತಿದಾಗ ಈ ನಂಬರ್‌ಗಳಿಗೆ test alert ಕಳಿಸಲಾಗುತ್ತದೆ.",
+    testSmsTtl:"SMS Test ನಂಬರ್", testSmsLbl:"Test SMS ಸ್ವೀಕರಿಸುವ ಫೋನ್ ನಂಬರ್",
+    testSmsHint:"Test SMS alert ಈ ನಂಬರ್‌ಗೆ ಕಳಿಸಲಾಗುತ್ತದೆ",
+    testWaTtl:"WhatsApp Test ನಂಬರ್", testWaLbl:"Test WhatsApp alert ಸ್ವೀಕರಿಸುವ ಫೋನ್ ನಂಬರ್",
+    testWaHint:"Test WhatsApp alert ಈ ನಂಬರ್‌ಗೆ ಕಳಿಸಲಾಗುತ್ತದೆ",
+    testCallTtl:"Call Test ನಂಬರ್", testCallLbl:"Test call ಸ್ವೀಕರಿಸುವ ಫೋನ್ ನಂಬರ್",
+    testCallHint:"Test call ಈ ನಂಬರ್‌ಗೆ ಮಾಡಲಾಗುತ್ತದೆ",
+    testSaveBtn:"TEST SETTINGS ಉಳಿಸಿ"
+  }
+};
+
+function L(key){var lang=LANG_DATA[S.appLang]||LANG_DATA.en;return lang[key]||LANG_DATA.en[key]||'';}
+function msgTemplate(n,url,t){return '\uD83D\uDEA8 EMERGENCY ALERT!\n'+n+' needs IMMEDIATE HELP!\n\uD83D\uDCCD Location: '+url+'\n\u23F0 '+t+'\nPlease respond IMMEDIATELY!';}
+
+/* ===================== STATE ===================== */
+var S={
+  userName:'',voiceLang:'en-IN',voiceWord:'help me',contacts:[],
+  appLang:'en',smsSim:'sim1',callerSim:'sim1',waNumber:'',
+  // SOS dedicated numbers
+  sosSmsNum:'',sosWaNum:'',sosCallNum:'',sosWaSimNum:'',
+  defaultSmsSim:'sim1',defaultWaNumber:'',defaultCallerSim:'sim1',
+  testSmsNum:'',testWaNum:'',testCallNum:'',
+  // Contact Settings: ordered arrays of contact indices per alert type
+  smsOrder:[],waOrder:[],callOrder:[],
+  // password (simple, stored as plain text for PWA)
+  appPassword:'',
+  profile:{}
+};
+var LS={
+  g:function(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},
+  s:function(k,v){localStorage.setItem(k,JSON.stringify(v));}
+};
+function loadS(){var d=LS.g('htz10');if(d)S=Object.assign({},S,d);}
+function saveS(){LS.s('htz10',S);}
+
+/* ===================== LANG ===================== */
+function applyLang(code,persist){
+  S.appLang=code;
+  if(persist)saveS();
+  function s(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+  s('ui-subtitle',L('subtitle'));
+  s('ui-q1',L('q1'));s('ui-q2',L('q2'));s('ui-q3',L('q3'));
+  s('ui-nav1',L('nav1'));s('ui-nav2',L('nav2'));s('ui-nav3',L('nav3'));
+  s('ui-nav4',L('nav4'));s('ui-nav5',L('nav5'));
+  s('ui-name-lbl',L('nameLbl'));
+  s('ui-vp-title','\uD83C\uDFA4 '+L('vpTitle'));
+  s('ui-vp-transcript-title','\uD83D\uDCE1 '+L('vpTransTitle'));
+  s('ui-vp-settings-title','\u2699 '+L('vpSetTitle'));
+  s('ui-vp-lang-lbl',L('vpLangLbl'));s('ui-vp-phrase-lbl',L('vpPhraseLbl'));
+  s('ui-vp-hint',L('vpHint'));s('ui-vp-save',L('vpSave'));
+  s('ui-cp-title','\uD83D\uDCDE '+L('cpTitle'));
+  s('ui-cp-card-title',L('cpCard'));s('ui-cp-add',L('cpAdd'));
+  s('ui-cp-info-title','\u2139\uFE0F '+L('cpInfoTitle'));
+  s('ui-cp-info',L('cpInfo'));s('ui-cp-save',L('cpSave'));
+  s('bgBadgeTxt',L('bgRunning'));
+  s('ui-dismiss','\u2713 '+L('dismiss'));
+  s('aov-title',L('alertSent'));
+  // SOS Settings page
+  s('ui-sos-sms-ttl','\uD83D\uDCF1 '+L('sosSmsNumTtl'));
+  s('ui-sos-sms-lbl',L('sosSmsNumLbl'));
+  s('ui-sos-sms-hint',L('sosSmsHint'));
+  s('ui-sos-wa-ttl','\uD83D\uDCAC '+L('sosWaTtl'));
+  s('ui-sos-wa-lbl',L('sosWaLbl'));
+  s('ui-sos-wa-hint',L('sosWaHint'));
+  s('ui-sos-call-ttl','\uD83D\uDCDE '+L('sosCallTtl'));
+  s('ui-sos-call-lbl',L('sosCallLbl'));
+  s('ui-sos-call-hint',L('sosCallHint'));
+  s('ui-sos-sim-ttl','\uD83D\uDCF1 '+L('sosSimTtl'));
+  s('ui-sos-sim-lbl',L('sosSimLbl'));
+  s('ui-sos-caller-lbl',L('sosCallerLbl'));
+  s('ui-sos-wa-sim-lbl',L('sosWaSimLbl'));
+  s('ui-sos-wa-sim-hint',L('sosWaSimHint'));
+  // Contact Settings page
+  s('ui-cs-sms-ttl','\uD83D\uDCF1 '+L('csSmsSecTtl'));
+  s('ui-cs-wa-ttl','\uD83D\uDCAC '+L('csWaSecTtl'));
+  s('ui-cs-call-ttl','\uD83D\uDCDE '+L('csCallSecTtl'));
+  s('ui-cs-sms-desc',L('csSmsDesc'));
+  s('ui-cs-wa-desc',L('csWaDesc'));
+  s('ui-cs-call-desc',L('csCallDesc'));
+  s('ui-cs-save',L('csSaveBtn'));
+  // Account Settings page
+  s('ui-acct-name-ttl','\uD83D\uDC64 '+L('acctNameTtl'));
+  s('ui-acct-preview-ttl','\uD83D\uDCAC '+L('acctPreviewTtl'));
+  s('ui-preview-needs',L('acctPreviewNeeds'));
+  s('ui-preview-gps',L('acctPreviewGps'));
+  s('ui-preview-time',L('acctPreviewTime'));
+  s('ui-preview-respond',L('acctPreviewRespond'));
+  s('ui-acct-pw-lbl',L('acctPwLbl'));
+  s('ui-acct-pw-sub',L('acctPwSub'));
+  s('ui-pw-cur-lbl',L('acctPwCurLbl'));
+  s('ui-pw-new-lbl',L('acctPwNewLbl'));
+  s('ui-pw-conf-lbl',L('acctPwConfLbl'));
+  s('ui-acct-logout-lbl','\uD83D\uDEAA '+L('acctLogoutLbl'));
+  s('ui-acct-logout-sub',L('acctLogoutSub'));
+  s('ui-acct-save',L('acctSaveBtn'));
+  // Menu drawer
+  s('ui-menu-sos-ttl',L('menuSosTtl'));
+  s('ui-menu-sos-sub',L('menuSosSub'));
+  s('ui-menu-voice-ttl',L('menuVoiceTtl'));
+  s('ui-menu-voice-sub',L('menuVoiceSub'));
+  s('ui-menu-contact-ttl',L('menuContactTtl'));
+  s('ui-menu-contact-sub',L('menuContactSub'));
+  s('ui-menu-account-ttl',L('menuAccountTtl'));
+  s('ui-menu-account-sub',L('menuAccountSub'));
+  s('ui-menu-sim-ttl',L('menuSimTtl'));
+  s('ui-menu-sim-sub',L('menuSimSub'));
+  // Default SIM settings page
+  s('ui-sim-pg-ttl','\uD83D\uDCF2 '+L('simPgTtl'));
+  s('ui-sim-sms-ttl','\uD83D\uDCF1 '+L('simSmsTtl'));
+  s('ui-sim-sms-lbl',L('simSmsLbl'));
+  s('ui-sim-wa-ttl','\uD83D\uDCAC '+L('simWaTtl'));
+  s('ui-sim-wa-lbl',L('simWaLbl'));
+  s('ui-sim-wa-hint',L('simWaHint'));
+  s('ui-sim-call-ttl','\uD83D\uDCDE '+L('simCallTtl'));
+  s('ui-sim-call-lbl',L('simCallLbl'));
+  // Menu Test Alert
+  s('ui-menu-test-ttl',L('menuTestTtl'));
+  s('ui-menu-test-sub',L('menuTestSub'));
+  // Test Alert Settings page
+  s('ui-test-pg-ttl','\uD83D\uDD14 '+L('testPgTtl'));
+  s('ui-test-desc',L('testDesc'));
+  s('ui-test-sms-ttl','\uD83D\uDCF1 '+L('testSmsTtl'));
+  s('ui-test-sms-lbl',L('testSmsLbl'));
+  s('ui-test-sms-hint',L('testSmsHint'));
+  s('ui-test-wa-ttl','\uD83D\uDCAC '+L('testWaTtl'));
+  s('ui-test-wa-lbl',L('testWaLbl'));
+  s('ui-test-wa-hint',L('testWaHint'));
+  s('ui-test-call-ttl','\uD83D\uDCDE '+L('testCallTtl'));
+  s('ui-test-call-lbl',L('testCallLbl'));
+  s('ui-test-call-hint',L('testCallHint'));
+  var fl=document.getElementById('langFlag');
+  var ln=document.getElementById('langName');
+  if(fl)fl.textContent=L('langFlag')==='GB'?'\uD83C\uDDEC\uD83C\uDDE7':'\uD83C\uDDEE\uD83C\uDDF3';
+  if(ln)ln.textContent=L('langShort');
+  document.querySelectorAll('.lang-opt').forEach(function(o){
+    var oc=o.getAttribute('onclick')||'';
+    o.classList.toggle('active',oc.indexOf("'"+code+"'")!==-1);
+  });
+  var al=document.getElementById('appLang');if(al)al.value=code;
+  updateMicUI();
+  var locEl=document.getElementById('locTxt');
+  if(locEl)locEl.textContent=gpsCoords?L('gpsReady'):L('gpsOff');
+}
+
+/* ===================== LANG DROPDOWN ===================== */
+function toggleLangDrop(){
+  var d=document.getElementById('langDrop');
+  var b=document.getElementById('langDropBtn');
+  var open=d.classList.toggle('open');
+  b.classList.toggle('open',open);
+}
+function selectLangDrop(code){
+  document.getElementById('langDrop').classList.remove('open');
+  document.getElementById('langDropBtn').classList.remove('open');
+  applyLang(code,true);
+}
+document.addEventListener('click',function(e){
+  var wrap=document.querySelector('.lang-dropdown-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    var d=document.getElementById('langDrop');
+    var b=document.getElementById('langDropBtn');
+    if(d)d.classList.remove('open');
+    if(b)b.classList.remove('open');
+  }
+});
+
+/* ===================== SCREENS ===================== */
+function selectLang(code){S.appLang=code;saveS();applyLang(code,false);showScreen('home');}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el=document.getElementById(id);
+  if(el)el.classList.add('active');
+  if(id==='home')updateBadge();
+  if(id==='contactpage')renderContactPage();
+  if(id==='profilepage')renderProfilePage();
+}
+function updateBadge(){
+  var b=document.getElementById('cBadge');
+  if(b)b.textContent=S.contacts.filter(function(c){return c.phone;}).length;
+}
+
+/* ===================== MENU DRAWER ===================== */
+function openMenuDrawer(){
+  document.getElementById('menuDrawer').classList.add('show');
+}
+function closeMenuDrawer(){
+  document.getElementById('menuDrawer').classList.remove('show');
+}
+function closeMenuDrawerOutside(e){
+  if(e.target===document.getElementById('menuDrawer'))closeMenuDrawer();
+}
+
+/* ===================== SUB-PAGES ===================== */
+function openSubPage(id){
+  closeMenuDrawer();
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('active');
+  if(id==='voiceSettings')renderVoicePage();
+  if(id==='sosSettings')renderSosSettings();
+  if(id==='contactSettings')renderContactSettings();
+  if(id==='accountSettings')renderAccountSettings();
+  if(id==='simSettings')renderSimSettings();
+  if(id==='testAlertSettings')renderTestAlertSettings();
+}
+function closeSubPage(id){
+  var el=document.getElementById(id);
+  if(el)el.classList.remove('active');
+}
+
+/* ===================== SOS SETTINGS ===================== */
+function renderSosSettings(){
+  var sv=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  sv('sosSmsNum',S.sosSmsNum);
+  sv('sosWaNum',S.sosWaNum);
+  sv('sosCallNum',S.sosCallNum);
+  sv('sosWaSimNum',S.sosWaSimNum);
+  var ss=document.getElementById('smsSim');if(ss)ss.value=S.smsSim||'sim1';
+  var cs=document.getElementById('callerSim');if(cs)cs.value=S.callerSim||'sim1';
+}
+function saveSosSettings(){
+  var gv=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  S.sosSmsNum=gv('sosSmsNum');
+  S.sosWaNum=gv('sosWaNum');
+  S.sosCallNum=gv('sosCallNum');
+  S.sosWaSimNum=gv('sosWaSimNum');
+  var ss=document.getElementById('smsSim');if(ss)S.smsSim=ss.value;
+  var cs=document.getElementById('callerSim');if(cs)S.callerSim=cs.value;
+  saveS();
+  showToast('\u2705 SOS Settings saved!');
+  setTimeout(function(){closeSubPage('sosSettings');},700);
+}
+
+/* ===================== VOICE PAGE ===================== */
+function renderVoicePage(){
+  var vpLang=document.getElementById('vpLang');
+  var vpWord=document.getElementById('vpWord');
+  var phrase=document.getElementById('vp-phrase-show');
+  var stat=document.getElementById('vp-stat');
+  var tb=document.getElementById('vpToggleBtn');
+  var orb=document.getElementById('vpOrb');
+  if(vpLang)vpLang.value=S.voiceLang;
+  if(vpWord)vpWord.value=S.voiceWord;
+  if(phrase)phrase.textContent='"'+S.voiceWord+'"';
+  if(stat)stat.textContent=voiceOn?L('vpOn'):L('vpOff');
+  if(tb){tb.textContent=voiceOn?'\u23F9 '+L('vpStop'):'\uD83C\uDFA4 '+L('vpStart');tb.className='toggle-btn '+(voiceOn?'on':'off');}
+  if(orb)orb.className='vp-orb'+(voiceOn?' on':'');
+}
+function saveVoiceSettings(){
+  var vpLang=document.getElementById('vpLang');
+  var vpWord=document.getElementById('vpWord');
+  S.voiceLang=vpLang?vpLang.value:'en-IN';
+  S.voiceWord=(vpWord&&vpWord.value.trim())||'help me';
+  saveS();
+  var phrase=document.getElementById('vp-phrase-show');
+  if(phrase)phrase.textContent='"'+S.voiceWord+'"';
+  if(voiceOn){stopVoice();startVoice();}
+  showToast('\u2705 '+L('saved'));
+}
+function toggleVoice(){voiceOn?stopVoice():startVoice();}
+
+/* ===================== CONTACT SETTINGS — DRAG & DROP ===================== */
+// Each list type: 'sms','wa','call'
+// S.smsOrder / S.waOrder / S.callOrder = arrays of {idx, selected}
+// idx refers to index in S.contacts
+
+function initOrderArray(key){
+  // Build from contacts, preserve existing order if valid
+  var arr=S[key+'Order']||[];
+  var result=[];
+  // First: existing selected in their saved order
+  arr.forEach(function(item){
+    if(S.contacts[item.idx]&&S.contacts[item.idx].phone){
+      result.push({idx:item.idx,selected:item.selected});
+    }
+  });
+  // Then: any contacts not yet in the list
+  S.contacts.forEach(function(c,i){
+    if(!c.phone)return;
+    var exists=result.some(function(r){return r.idx===i;});
+    if(!exists)result.push({idx:i,selected:false});
+  });
+  return result;
+}
+
+var dragState={active:false,listType:'',dragIdx:-1,clone:null};
+
+function renderContactSettings(){
+  var types=['sms','wa','call'];
+  types.forEach(function(type){
+    S[type+'Order']=initOrderArray(type);
+    renderCSList(type);
+  });
+}
+
+function renderCSList(type){
+  var idMap={sms:'csSMSList',wa:'csWAList',call:'csCallList'};
+  var el=document.getElementById(idMap[type]);
+  if(!el)return;
+  var order=S[type+'Order'];
+  el.innerHTML='';
+  if(!order.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px;font-weight:600;padding:10px;text-align:center">No contacts added yet</div>';
+    return;
+  }
+  // Sort: selected first (in their order), then unselected
+  var selBadge=0;
+  order.forEach(function(item,pos){
+    var c=S.contacts[item.idx]||{name:'?',phone:''};
+    var row=document.createElement('div');
+    row.className='cs-row'+(item.selected?' selected':' unselected');
+    row.dataset.pos=pos;
+    row.dataset.type=type;
+    if(item.selected)selBadge++;
+    var badge=item.selected?selBadge:'';
+    row.innerHTML=
+      '<div class="cs-drag" draggable="false"><span></span><span></span><span></span></div>'+
+      '<div class="cs-badge'+(item.selected?'':' empty')+'">'+badge+'</div>'+
+      '<div style="flex:1"><div class="cs-name">'+esc(c.name||'No name')+'</div>'+
+      '<div class="cs-phone">'+esc(c.phone)+'</div></div>'+
+      '<div class="cs-sel'+(item.selected?' checked':'')+'">'+
+        (item.selected?'&#10003;':'')+'</div>';
+    // Toggle select on row click (anywhere except drag handle)
+    row.addEventListener('click',function(e){
+      if(e.target.closest('.cs-drag'))return;
+      item.selected=!item.selected;
+      renderCSList(type);
+    });
+    // Drag handle — touch + mouse
+    var handle=row.querySelector('.cs-drag');
+    attachDrag(handle,row,type,pos,el);
+    el.appendChild(row);
+  });
+}
+
+function attachDrag(handle,row,type,pos,container){
+  // Touch
+  handle.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    startDrag(type,pos,row,e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
+  document.addEventListener('touchmove',onDragMove,{passive:false});
+  document.addEventListener('touchend',onDragEnd);
+  // Mouse
+  handle.addEventListener('mousedown',function(e){
+    e.preventDefault();
+    startDrag(type,pos,row,e.clientX,e.clientY);
+  });
+  document.addEventListener('mousemove',onDragMoveM);
+  document.addEventListener('mouseup',onDragEndM);
+}
+
+function startDrag(type,pos,row,cx,cy){
+  dragState.active=true;
+  dragState.listType=type;
+  dragState.dragIdx=pos;
+  dragState.startX=cx;dragState.startY=cy;
+  // Create floating clone
+  var clone=row.cloneNode(true);
+  clone.className='drag-clone';
+  clone.style.left=(cx-10)+'px';
+  clone.style.top=(cy-20)+'px';
+  clone.style.width=row.offsetWidth+'px';
+  document.body.appendChild(clone);
+  dragState.clone=clone;
+  row.classList.add('dragging');
+  dragState.row=row;
+}
+
+function onDragMove(e){
+  if(!dragState.active)return;
+  e.preventDefault();
+  var cx=e.touches?e.touches[0].clientX:e.clientX;
+  var cy=e.touches?e.touches[0].clientY:e.clientY;
+  moveDrag(cx,cy);
+}
+function onDragMoveM(e){if(dragState.active)moveDrag(e.clientX,e.clientY);}
+
+function moveDrag(cx,cy){
+  if(dragState.clone){
+    dragState.clone.style.left=(cx-10)+'px';
+    dragState.clone.style.top=(cy-20)+'px';
+  }
+  // Find target row
+  var idMap={sms:'csSMSList',wa:'csWAList',call:'csCallList'};
+  var el=document.getElementById(idMap[dragState.listType]);
+  if(!el)return;
+  var rows=el.querySelectorAll('.cs-row');
+  var target=-1;
+  rows.forEach(function(r,i){
+    r.classList.remove('drag-over');
+    var rect=r.getBoundingClientRect();
+    if(cy>=rect.top&&cy<=rect.bottom)target=i;
+  });
+  dragState.targetIdx=target;
+  if(target>=0&&target!==dragState.dragIdx)rows[target].classList.add('drag-over');
+}
+
+function onDragEnd(e){if(dragState.active)endDrag();}
+function onDragEndM(e){if(dragState.active)endDrag();}
+
+function endDrag(){
+  if(dragState.clone){dragState.clone.remove();dragState.clone=null;}
+  if(dragState.row)dragState.row.classList.remove('dragging');
+  var idMap={sms:'csSMSList',wa:'csWAList',call:'csCallList'};
+  var el=document.getElementById(idMap[dragState.listType]);
+  if(el)el.querySelectorAll('.cs-row').forEach(function(r){r.classList.remove('drag-over');});
+  var type=dragState.listType;
+  var from=dragState.dragIdx;
+  var to=dragState.targetIdx;
+  if(to>=0&&to!==from&&to!==undefined){
+    var arr=S[type+'Order'];
+    var moved=arr.splice(from,1)[0];
+    arr.splice(to,0,moved);
+    renderCSList(type);
+  }
+  dragState.active=false;
+  dragState.targetIdx=undefined;
+}
+
+function saveContactSettings(){
+  // Already stored live in S.*Order arrays; just persist
+  saveS();
+  showToast('\u2705 Contact Settings saved!');
+  setTimeout(function(){closeSubPage('contactSettings');},700);
+}
+
+/* ===================== DEFAULT SIM & WHATSAPP SETTINGS ===================== */
+function renderSimSettings(){
+  var sv=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  var ss=document.getElementById('defaultSmsSim');if(ss)ss.value=S.defaultSmsSim||'sim1';
+  var cs=document.getElementById('defaultCallerSim');if(cs)cs.value=S.defaultCallerSim||'sim1';
+  sv('defaultWaNumber',S.defaultWaNumber);
+}
+function saveSimSettings(){
+  var gv=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  var ss=document.getElementById('defaultSmsSim');if(ss)S.defaultSmsSim=ss.value;
+  var cs=document.getElementById('defaultCallerSim');if(cs)S.defaultCallerSim=cs.value;
+  S.defaultWaNumber=gv('defaultWaNumber');
+  saveS();
+  showToast('\u2705 SIM Settings saved!');
+  setTimeout(function(){closeSubPage('simSettings');},700);
+}
+
+/* ===================== TEST ALERT SETTINGS ===================== */
+function renderTestAlertSettings(){
+  var sv=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  sv('testSmsNum',S.testSmsNum);
+  sv('testWaNum',S.testWaNum);
+  sv('testCallNum',S.testCallNum);
+}
+function saveTestAlertSettings(){
+  var gv=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  S.testSmsNum=gv('testSmsNum');
+  S.testWaNum=gv('testWaNum');
+  S.testCallNum=gv('testCallNum');
+  saveS();
+  showToast('\u2705 Test Alert Settings saved!');
+  setTimeout(function(){closeSubPage('testAlertSettings');},700);
+}
+
+/* ===================== ACCOUNT SETTINGS ===================== */
+function renderAccountSettings(){
+  var un=document.getElementById('uName');if(un)un.value=S.userName||'';
+  var al=document.getElementById('appLang');if(al)al.value=S.appLang||'en';
+  var pn=document.getElementById('pName');if(pn)pn.textContent=S.userName||'Your Name';
+}
+function saveAccountSettings(){
+  var un=document.getElementById('uName');
+  if(un)S.userName=un.value.trim();
+  var al=document.getElementById('appLang');
+  if(al){S.appLang=al.value;applyLang(al.value,false);}
+  if(S.profile&&!S.profile.name&&S.userName)S.profile.name=S.userName;
+  saveS();
+  showToast('\u2705 '+L('saved'));
+  setTimeout(function(){closeSubPage('accountSettings');},700);
+}
+
+function togglePwCard(){
+  var c=document.getElementById('pwCard');
+  var a=document.getElementById('pwArrow');
+  if(c)c.classList.toggle('show');
+  if(a)a.textContent=c.classList.contains('show')?'&#9660;':'&#9654;';
+}
+function changePassword(){
+  var cur=document.getElementById('pwCurrent').value;
+  var nw=document.getElementById('pwNew').value;
+  var cf=document.getElementById('pwConfirm').value;
+  if(S.appPassword&&cur!==S.appPassword){showToast('\u274C Current password wrong!');return;}
+  if(!nw){showToast('\u274C Enter new password');return;}
+  if(nw!==cf){showToast('\u274C Passwords do not match');return;}
+  S.appPassword=nw;saveS();
+  document.getElementById('pwCurrent').value='';
+  document.getElementById('pwNew').value='';
+  document.getElementById('pwConfirm').value='';
+  showToast('\u2705 Password changed!');
+  togglePwCard();
+}
+function logOut(){
+  if(!confirm('Log out and clear session?'))return;
+  LS.s('htz10',null);
+  LS.s('htz_voice','0');
+  location.reload();
+}
+
+/* ===================== CONTACTS PAGE ===================== */
+function renderContactPage(){
+  var list=document.getElementById('cpList');list.innerHTML='';
+  S.contacts.forEach(function(c,i){
+    var row=document.createElement('div');row.className='crow';
+    row.innerHTML='<input class="finp" type="text" placeholder="Name" value="'+esc(c.name)+'" data-i="'+i+'" data-f="name"/>'
+      +'<input class="finp" type="tel" placeholder="+91XXXXXXXXXX" value="'+esc(c.phone)+'" data-i="'+i+'" data-f="phone"/>'
+      +'<button class="cdel" data-i="'+i+'">\u2715</button>';
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('input',function(e){
+      S.contacts[+e.target.dataset.i][e.target.dataset.f]=e.target.value;
+    });
+  });
+  list.querySelectorAll('.cdel').forEach(function(b){
+    b.addEventListener('click',function(){
+      S.contacts.splice(+b.dataset.i,1);renderContactPage();
+    });
+  });
+  document.getElementById('cpAddBtn').style.display=S.contacts.length>=7?'none':'';
+}
+function addContact(){
+  if(S.contacts.length>=7)return;
+  S.contacts.push({name:'',phone:''});renderContactPage();
+}
+function saveContacts(){
+  saveS();updateBadge();
+  showToast('\u2705 '+L('saved'));
+  setTimeout(function(){showScreen('home');},700);
+}
+
+/* ===================== GPS ===================== */
+var gpsCoords=null;
+function startGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.watchPosition(
+    function(p){
+      gpsCoords=p.coords;
+      setDot('locDot','g');setTxt('locTxt',L('gpsReady'));setPill('locPill',true);
+    },
+    function(){setDot('locDot','');setTxt('locTxt',L('gpsOff'));setPill('locPill',false);},
+    {enableHighAccuracy:true,maximumAge:15000}
+  );
+}
+function getGPS(){
+  return new Promise(function(res){
+    if(gpsCoords){res(gpsCoords);return;}
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(function(p){res(p.coords);},function(){res(null);},{timeout:8000,enableHighAccuracy:true});
+    }else res(null);
+  });
+}
+function mapsUrl(c){return c?'https://maps.google.com/?q='+c.latitude+','+c.longitude:'(GPS unavailable)';}
+
+/* ===================== TTS ===================== */
+function speakText(text){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  var m={en:'en-IN',ta:'ta-IN',ml:'ml-IN',hi:'hi-IN',te:'te-IN',kn:'kn-IN'};
+  u.lang=m[S.appLang]||'en-IN';
+  u.rate=0.88;u.pitch=1.0;u.volume=1.0;
+  window.speechSynthesis.speak(u);
+}
+
+/* ===================== VOICE DETECTION ===================== */
+var recognition=null,voiceOn=false;
+function buildRec(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  var r=new SR();
+  r.continuous=true;r.interimResults=true;r.lang=S.voiceLang;
+  r.onresult=function(e){
+    var txt='';
+    for(var i=e.resultIndex;i<e.results.length;i++)txt+=e.results[i][0].transcript;
+    var tp=document.getElementById('vpTranscript');if(tp)tp.textContent=txt||'--';
+    if(txt.toLowerCase().indexOf(S.voiceWord.toLowerCase())!==-1)triggerAlert('voice');
+  };
+  r.onerror=function(e){
+    if(e.error==='not-allowed'){showToast('Mic permission denied');voiceOn=false;updateMicUI();}
+    else if(e.error!=='aborted'){setTimeout(function(){if(voiceOn)try{r.start();}catch(ex){}},1000);}
+  };
+  r.onend=function(){if(voiceOn)setTimeout(function(){try{recognition&&recognition.start();}catch(ex){}},500);};
+  return r;
+}
+function startVoice(){
+  recognition=buildRec();
+  if(!recognition){showToast('Voice not supported');return;}
+  recognition.lang=S.voiceLang;
+  try{recognition.start();}catch(e){}
+  voiceOn=true;LS.s('htz_voice','1');updateMicUI();
+  // Update voice settings page if open
+  var vsPage=document.getElementById('voiceSettings');
+  if(vsPage&&vsPage.classList.contains('active'))renderVoicePage();
+  showBgBadge(true);
+}
+function stopVoice(){
+  voiceOn=false;try{if(recognition)recognition.stop();}catch(e){}
+  LS.s('htz_voice','0');updateMicUI();
+  var vsPage=document.getElementById('voiceSettings');
+  if(vsPage&&vsPage.classList.contains('active'))renderVoicePage();
+  showBgBadge(false);
+}
+function updateMicUI(){
+  var ico=document.getElementById('micSvgIcon');
+  var bdg=document.getElementById('micBdg');
+  var btn=document.getElementById('micBtn');
+  var lbl=document.getElementById('ui-q1');
+  if(voiceOn){
+    if(ico)ico.innerHTML='<circle cx="24" cy="24" r="18" fill="rgba(255,255,255,0.12)"/><circle cx="24" cy="24" r="10" fill="white" opacity="0.88"/><circle cx="24" cy="24" r="6" fill="#ff2035"/>';
+    if(bdg)bdg.style.display='flex';
+    if(btn)btn.classList.add('voice-active');
+    if(lbl)lbl.textContent=L('vpStop')||'Stop Voice';
+    setDot('micDot','r');setTxt('micTxt','"'+S.voiceWord+'"');setPill('micPill',true);
+  }else{
+    if(ico)ico.innerHTML='<rect x="17" y="4" width="14" height="22" rx="7" fill="white" opacity="0.95"/><path d="M10 22c0 7.732 6.268 14 14 14s14-6.268 14-14" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/><line x1="24" y1="36" x2="24" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="17" y1="44" x2="31" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>';
+    if(bdg)bdg.style.display='none';
+    if(btn)btn.classList.remove('voice-active');
+    if(lbl)lbl.textContent=L('q1')||'Start Voice';
+    setDot('micDot','');setTxt('micTxt',L('voiceOff'));setPill('micPill',false);
+  }
+}
+
+/* ===================== MIC BUTTON — TOGGLE VOICE ===================== */
+document.getElementById('micBtn').addEventListener('click',function(){
+  // Direct toggle — no navigation to voice page
+  toggleVoice();
+});
+
+/* ===================== BACKGROUND ===================== */
+function showBgBadge(on){var b=document.getElementById('bgBadge');if(b)b.classList.toggle('show',on);}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'&&voiceOn){
+    setTimeout(function(){if(voiceOn&&recognition)try{recognition.start();}catch(e){};},800);
+  }
+});
+window.addEventListener('popstate',function(){
+  history.pushState(null,'',location.href);
+  var active=document.querySelector('.screen.active');
+  if(active&&active.id!=='home'&&active.id!=='langselect')showScreen('home');
+});
+history.pushState(null,'',location.href);
+
+function minimizeApp(){
+  if(navigator.vibrate)navigator.vibrate(100);
+  showBgBadge(true);
+  showToast(L('bgRunning'));
+  if(/Android/i.test(navigator.userAgent)){
+    history.pushState(null,'',location.href);
+    window.history.go(-2);
+  }else{
+    window.blur();
+  }
+}
+
+/* ===================== ALERT FLOW ===================== */
+var alertBusy=false;
+var cStep=0,cMsg='',cEnc='',cContacts=[],cCoords=null;
+var cRec=null,cVoiceOn=false;
+var alertSource='normal'; // 'normal' or 'sos'
+
+/* Ordered contacts for each alert type */
+function getOrderedContacts(type){
+  var orderKey=type+'Order'; // 'smsOrder','waOrder','callOrder'
+  var order=S[orderKey]||[];
+  var selected=order.filter(function(o){return o.selected&&S.contacts[o.idx]&&S.contacts[o.idx].phone.trim();});
+  if(selected.length)return selected.map(function(o){return S.contacts[o.idx];});
+  // Fallback: all contacts
+  return S.contacts.filter(function(c){return c.phone.trim();});
+}
+
+/* SOS button — uses dedicated SOS numbers */
+function triggerSOS(){
+  if(alertBusy)return;
+  alertBusy=true;
+  if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);
+  var name=S.userName||'Someone';
+  var time=new Date().toLocaleString();
+  cCoords=gpsCoords;
+  var mapUrl=mapsUrl(cCoords);
+  cMsg=msgTemplate(name,mapUrl,time);
+  cEnc=encodeURIComponent(cMsg);
+  cStep=0;
+  alertSource='sos';
+  // Build SOS-specific contacts list
+  cContacts=[];
+  if(S.sosSmsNum||S.sosWaNum||S.sosCallNum){
+    // use dedicated SOS numbers
+  } else {
+    // fallback to all contacts if SOS not configured
+    cContacts=S.contacts.filter(function(c){return c.phone.trim();});
+    if(!cContacts.length){showToast(L('noContacts'));alertBusy=false;return;}
+  }
+  showConfirmStep();
+  getGPS().then(function(coords){
+    if(coords){cCoords=coords;var fu=mapsUrl(coords);cMsg=msgTemplate(name,fu,time);cEnc=encodeURIComponent(cMsg);}
+  });
+}
+
+/* Normal big-sphere alert */
+function triggerAlert(src){
+  if(alertBusy)return;
+  alertBusy=true;
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  var allC=S.contacts.filter(function(c){return c.phone.trim();});
+  if(!allC.length){showToast(L('noContacts'));alertBusy=false;return;}
+  cContacts=allC;
+  var name=S.userName||'Someone';
+  var time=new Date().toLocaleString();
+  cCoords=gpsCoords;
+  var mapUrl=mapsUrl(cCoords);
+  cMsg=msgTemplate(name,mapUrl,time);
+  cEnc=encodeURIComponent(cMsg);
+  cStep=0;
+  alertSource='normal';
+  showConfirmStep();
+  getGPS().then(function(coords){
+    if(coords){cCoords=coords;var fu=mapsUrl(coords);cMsg=msgTemplate(name,fu,time);cEnc=encodeURIComponent(cMsg);}
+  });
+}
+
+function showConfirmStep(){
+  var pop=document.getElementById('confirmPop');
+  pop.classList.add('show');
+  ['cpDot0','cpDot1','cpDot2'].forEach(function(id,i){
+    var d=document.getElementById(id);
+    if(d)d.className='cp-dot'+(i<cStep?' done':i===cStep?' active':'');
+  });
+  var icons=['\uD83D\uDCF1','\uD83D\uDCAC','\uD83D\uDCDE'];
+  var msgKeys=['confirmSMS','confirmWA','confirmCall'];
+  document.getElementById('cpIcon').innerHTML=icons[cStep];
+  document.getElementById('cpMsg').textContent=L(msgKeys[cStep]);
+  document.getElementById('cpOKTxt').textContent=L('confirmOK');
+  document.getElementById('cpCancelTxt').textContent=L('confirmCancel');
+  var stepHints=[
+    'Tap OK — SMS app will open. Send the message. When you come back, WhatsApp alert will open automatically.',
+    'Tap OK — WhatsApp app will open directly. Send the message. After each contact is done, the next one opens automatically.',
+    'Tap OK — Dialer opens. Tap Call. After the call, come back to the app.'
+  ];
+  document.getElementById('cpHint').textContent=stepHints[cStep];
+  document.getElementById('cpTranscript').textContent='Say "'+L('confirmOK')+'" or "'+L('confirmCancel')+'" or tap below';
+  speakText(L(msgKeys[cStep]));
+  startConfirmVoice();
+}
+
+/* ── WhatsApp native app URL builder ── */
+function waAppUrl(phone,encodedMsg){
+  var ua=navigator.userAgent||'';
+  var ph=fmtPhone(phone);
+  if(/Android/i.test(ua)){
+    // Android: use intent URI to open WhatsApp app directly, fallback to wa.me
+    return 'intent://send/'+ph+'#Intent;scheme=whatsapp;package=com.whatsapp;action=android.intent.action.SENDTO;S.android.intent.extra.TEXT='+encodedMsg+';end';
+  }else if(/iPhone|iPad|iPod/i.test(ua)){
+    // iOS: use whatsapp:// URI scheme
+    return 'whatsapp://send?phone='+ph+'&text='+encodedMsg;
+  }else{
+    // Desktop fallback
+    return 'https://wa.me/'+ph+'?text='+encodedMsg;
+  }
+}
+function openWA(phone,encodedMsg){
+  var ua=navigator.userAgent||'';
+  var ph=fmtPhone(phone);
+  if(/Android/i.test(ua)){
+    // Try intent URI first; if it fails browser will do nothing, so also open wa.me as fallback
+    var intentUrl='intent://send?phone='+ph+'#Intent;scheme=whatsapp;package=com.whatsapp;end;S.browser_fallback_url='+encodeURIComponent('https://wa.me/'+ph+'?text='+encodedMsg);
+    window.location.href=intentUrl;
+  }else if(/iPhone|iPad|iPod/i.test(ua)){
+    window.location.href='whatsapp://send?phone='+ph+'&text='+encodedMsg;
+  }else{
+    window.open('https://wa.me/'+ph+'?text='+encodedMsg,'_blank');
+  }
+}
+
+/* ── Sequential WhatsApp sender ──
+   Sends to each contact one-by-one.
+   After opening WhatsApp for contact N, waits for user to return
+   (visibilitychange: visible), then opens WhatsApp for contact N+1.
+   After all contacts done, calls onComplete().
+*/
+var waSendQueue=[];
+var waSendOnComplete=null;
+var waVisHandler=null;
+
+function sendWASequential(contacts,encodedMsg,onComplete){
+  waSendQueue=contacts.slice(); // copy
+  waSendOnComplete=onComplete;
+  if(waVisHandler){document.removeEventListener('visibilitychange',waVisHandler);}
+  function sendNext(){
+    if(!waSendQueue.length){
+      if(waVisHandler){document.removeEventListener('visibilitychange',waVisHandler);}
+      waVisHandler=null;
+      if(waSendOnComplete)waSendOnComplete();
+      return;
+    }
+    var c=waSendQueue.shift();
+    var ph=c.phone||c; // accept both contact obj and plain phone string
+    // Listen for user returning from WhatsApp before sending next
+    waVisHandler=function(){
+      if(document.visibilityState==='visible'){
+        document.removeEventListener('visibilitychange',waVisHandler);
+        waVisHandler=null;
+        // Small delay so the app fully comes back
+        setTimeout(sendNext,600);
+      }
+    };
+    document.addEventListener('visibilitychange',waVisHandler);
+    openWA(ph,encodedMsg);
+  }
+  sendNext();
+}
+
+function confirmAction(isOK){
+  stopConfirmVoice();
+  var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(isOK){
+    if(cStep===0){
+      // ── SMS step: send to all contacts at once, then advance ──
+      if(alertSource==='sos'&&S.sosSmsNum){
+        var smsUrl='sms:'+S.sosSmsNum+(isMob?'?&':'?')+'body='+cEnc;
+        var a=document.createElement('a');a.href=smsUrl;a.style.display='none';
+        document.body.appendChild(a);a.click();
+        setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+        showToast('\uD83D\uDCF1 SOS SMS sent!');
+      }else{
+        var contacts=getOrderedContacts('sms');
+        contacts.forEach(function(c,i){
+          setTimeout(function(){
+            var smsUrl='sms:'+c.phone+(isMob?'?&':'?')+'body='+cEnc;
+            var a=document.createElement('a');a.href=smsUrl;a.style.display='none';
+            document.body.appendChild(a);a.click();
+            setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+          },i*600);
+        });
+        showToast('\uD83D\uDCF1 SMS \u2192 '+contacts.length+' contacts!');
+      }
+      cStep=1;
+      // Wait for user to come back from SMS app, then show WhatsApp confirm
+      var smsReturnHandler=function(){
+        if(document.visibilityState==='visible'){
+          document.removeEventListener('visibilitychange',smsReturnHandler);
+          setTimeout(showConfirmStep,600);
+        }
+      };
+      document.addEventListener('visibilitychange',smsReturnHandler);
+      // Safety fallback: if SMS app never opened (desktop), advance after 1.5s
+      setTimeout(function(){
+        if(cStep===1){
+          document.removeEventListener('visibilitychange',smsReturnHandler);
+          showConfirmStep();
+        }
+      },1500);
+
+    }else if(cStep===1){
+      // ── WhatsApp step: open native WA app for each contact sequentially ──
+      cStep=2; // advance now so safety timeout below works
+      if(alertSource==='sos'&&S.sosWaNum){
+        showToast('\uD83D\uDCAC SOS WhatsApp sending...');
+        sendWASequential([{phone:S.sosWaNum}],cEnc,function(){
+          showConfirmStep(); // show Call confirm after all WA done
+        });
+      }else{
+        var contacts=getOrderedContacts('wa');
+        showToast('\uD83D\uDCAC WhatsApp \u2192 '+contacts.length+' contacts...');
+        sendWASequential(contacts,cEnc,function(){
+          showConfirmStep(); // show Call confirm after all WA done
+        });
+      }
+      // Do NOT call showConfirmStep here — sendWASequential does it on completion
+
+    }else if(cStep===2){
+      // ── Call step: dial contacts one by one ──
+      if(alertSource==='sos'&&S.sosCallNum){
+        var a=document.createElement('a');a.href='tel:'+S.sosCallNum;a.style.display='none';
+        document.body.appendChild(a);a.click();
+        setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+        showToast('\uD83D\uDCDE SOS Call initiated!');
+      }else{
+        var contacts=getOrderedContacts('call');
+        contacts.forEach(function(c,i){
+          setTimeout(function(){
+            var a=document.createElement('a');a.href='tel:'+c.phone;a.style.display='none';
+            document.body.appendChild(a);a.click();
+            setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+          },i*5000);
+        });
+        showToast('\uD83D\uDCDE Calling '+contacts.length+' contacts!');
+      }
+      cStep=3;
+      closeConfirm(true);
+    }
+  }else{
+    // Cancel at this step — skip to next step
+    cStep++;
+    if(cStep<3){setTimeout(showConfirmStep,400);}
+    else{closeConfirm(false);}
+  }
+}
+
+function closeConfirm(sent){
+  var pop=document.getElementById('confirmPop');
+  pop.classList.remove('show');
+  stopConfirmVoice();
+  alertBusy=false;
+  if(sent){
+    var aov=document.getElementById('aov');
+    aov.classList.add('show');
+    setTxt('aov-title',L('alertSent'));
+    setTxt('ui-dismiss','\u2713 '+L('dismiss'));
+    setTxt('aovMsg','All alerts completed!');
+    document.getElementById('aovSteps').innerHTML='';
+    addStep('\u2705','SMS alert sent',false);
+    addStep('\u2705','WhatsApp alert sent',false);
+    addStep('\u2705','Calls initiated',false);
+    addStep(cCoords?'\uD83D\uDCCD':'\u26A0\uFE0F',
+      cCoords?'GPS: '+cCoords.latitude.toFixed(5)+', '+cCoords.longitude.toFixed(5):'GPS unavailable',false);
+  }
+}
+
+function startConfirmVoice(){
+  stopConfirmVoice();
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  cRec=new SR();
+  cRec.lang=S.voiceLang;cRec.continuous=false;cRec.interimResults=true;
+  var okWords=(LANG_DATA[S.appLang]||LANG_DATA.en).okWords||['ok','yes'];
+  var cancelWords=(LANG_DATA[S.appLang]||LANG_DATA.en).cancelWords||['cancel','no'];
+  cRec.onresult=function(e){
+    var txt='';
+    for(var i=e.resultIndex;i<e.results.length;i++)txt+=e.results[i][0].transcript;
+    setTxt('cpTranscript',txt||'...');
+    var t=txt.toLowerCase();
+    var isOK=okWords.some(function(w){return t.indexOf(w)!==-1;});
+    var isCancel=cancelWords.some(function(w){return t.indexOf(w)!==-1;});
+    if(isOK)confirmAction(true);
+    else if(isCancel)confirmAction(false);
+  };
+  cRec.onend=function(){if(cVoiceOn)try{cRec.start();}catch(e){};};
+  cVoiceOn=true;
+  try{cRec.start();}catch(e){}
+}
+function stopConfirmVoice(){cVoiceOn=false;try{if(cRec)cRec.stop();}catch(e){}}
+
+/* ===================== TEST ===================== */
+document.getElementById('testBtn').addEventListener('click',function(){
+  if(alertBusy)return;
+  // Check if test numbers are configured
+  var tSms=S.testSmsNum||'';
+  var tWa=S.testWaNum||'';
+  var tCall=S.testCallNum||'';
+  if(!tSms&&!tWa&&!tCall){
+    // No test numbers set — show info overlay (original behaviour)
+    var aov=document.getElementById('aov');
+    aov.classList.add('show');
+    setTxt('aov-title',L('testMode')||'TEST MODE');
+    setTxt('aovMsg','No test numbers set. Go to Menu → Test Alert Settings to configure.');
+    document.getElementById('aovSteps').innerHTML='';
+    addStep('\uD83D\uDCF1',S.contacts.filter(function(c){return c.phone;}).length+' contacts ready',false);
+    addStep(gpsCoords?'\uD83D\uDCCD':'\u26A0\uFE0F',gpsCoords?'GPS ready':'GPS not ready',false);
+    addStep('\uD83C\uDFA4',voiceOn?'Voice ON: "'+S.voiceWord+'"':'Voice OFF',false);
+    if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    alertBusy=false;
+    return;
+  }
+  // Test numbers configured — send actual test alerts
+  alertBusy=true;
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+  var name=S.userName||'Test User';
+  var time=new Date().toLocaleString();
+  var mapUrl=mapsUrl(gpsCoords);
+  var testMsg='[TEST ALERT] \uD83D\uDEA8 This is a TEST from Hatzilu App.\n\uD83D\uDC64 '+name+'\n\uD83D\uDCCD '+mapUrl+'\n\u23F0 '+time+'\n(No action needed - this is a test)';
+  var testEnc=encodeURIComponent(testMsg);
+  var steps=[];
+  // SMS
+  if(tSms){
+    var smsUrl='sms:'+tSms+(isMob?'?&':'?')+'body='+testEnc;
+    var a=document.createElement('a');a.href=smsUrl;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+    steps.push(['\uD83D\uDCF1','Test SMS sent to '+tSms]);
+  }
+  // WhatsApp
+  if(tWa){
+    setTimeout(function(){
+      var ph=fmtPhone(tWa);
+      var waUrl='https://wa.me/'+ph+'?text='+testEnc;
+      window.location.href=waUrl;
+    },tSms?900:0);
+    steps.push(['\uD83D\uDCAC','Test WhatsApp to '+tWa]);
+  }
+  // Call
+  if(tCall){
+    setTimeout(function(){
+      var a=document.createElement('a');a.href='tel:'+tCall;a.style.display='none';
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){try{document.body.removeChild(a);}catch(e){}},300);
+    },(tSms&&tWa)?1800:tSms||tWa?900:0);
+    steps.push(['\uD83D\uDCDE','Test call to '+tCall]);
+  }
+  // Show result overlay
+  var aov=document.getElementById('aov');
+  aov.classList.add('show');
+  setTxt('aov-title',L('testMode')||'TEST MODE');
+  setTxt('aovMsg','Test alerts sent!');
+  document.getElementById('aovSteps').innerHTML='';
+  steps.forEach(function(s){addStep(s[0],s[1],false);});
+  addStep(gpsCoords?'\uD83D\uDCCD':'\u26A0\uFE0F',gpsCoords?'GPS: ready':'GPS: not ready',false);
+  alertBusy=false;
+});
+
+document.getElementById('mainBtn').addEventListener('click',function(){triggerAlert('button');});
+
+function addStep(ico,txt,isLink,href){
+  var steps=document.getElementById('aovSteps');
+  var el=document.createElement(isLink?'a':'div');
+  el.className='aov-step';
+  el.innerHTML='<span>'+ico+'</span><span>'+txt+'</span>';
+  if(isLink){el.href=href;el.target='_blank';el.addEventListener('click',function(){el.classList.add('done');});}
+  steps.appendChild(el);
+}
+function dismissAlert(){document.getElementById('aov').classList.remove('show');alertBusy=false;}
+
+/* ===================== HELPERS ===================== */
+function setDot(id,c){var d=document.getElementById(id);if(d)d.className='sdot'+(c?' '+c:'');}
+function setTxt(id,t){var e=document.getElementById(id);if(e)e.textContent=t;}
+function setPill(id,on){var e=document.getElementById(id);if(e)e.classList.toggle('on',on);}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtPhone(p){var n=p.replace(/\D/g,'');if(n.charAt(0)==='0')n=n.slice(1);if(n.indexOf('91')!==0&&n.length===10)n='91'+n;return n;}
+var tT;
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('show');},3200);}
+
+/* ===================== PROFILE PAGE ===================== */
+function renderProfilePage(){
+  var P=S.profile||{};
+  var setV=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  setV('prName',P.name);setV('prFather',P.father);setV('prAge',P.age);
+  setV('prOccupation',P.occupation);setV('prPhone',P.phone);
+  setV('prEmail',P.email);setV('prAddress',P.address);
+  setV('prFacebook',P.facebook);setV('prInstagram',P.instagram);
+  setV('prYoutube',P.youtube);
+  updateProfilePreview();
+}
+function updateProfilePreview(){
+  var P=S.profile||{};
+  var card=document.getElementById('profilePreviewCard');
+  var prev=document.getElementById('profilePreview');
+  if(!P.name){if(card)card.style.display='none';return;}
+  if(card)card.style.display='block';
+  var html='';
+  if(P.name)html+='<div>&#128100; <strong>'+esc(P.name)+'</strong></div>';
+  if(P.father)html+='<div>&#128106; '+esc(P.father)+'</div>';
+  if(P.age)html+='<div>&#127881; Age: '+esc(P.age)+'</div>';
+  if(P.occupation)html+='<div>&#128188; '+esc(P.occupation)+'</div>';
+  if(P.phone)html+='<div>&#128241; '+esc(P.phone)+'</div>';
+  if(P.email)html+='<div>&#128140; '+esc(P.email)+'</div>';
+  if(P.address)html+='<div>&#128205; '+esc(P.address)+'</div>';
+  if(P.facebook)html+='<div style="color:#1877F2">&#9711; Facebook</div>';
+  if(P.instagram)html+='<div style="color:#E1306C">&#9711; Instagram</div>';
+  if(P.youtube)html+='<div style="color:#FF0000">&#9711; YouTube</div>';
+  if(prev)prev.innerHTML=html;
+}
+function saveProfile(){
+  if(!S.profile)S.profile={};
+  var gV=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  S.profile.name=gV('prName');S.profile.father=gV('prFather');S.profile.age=gV('prAge');
+  S.profile.occupation=gV('prOccupation');S.profile.phone=gV('prPhone');
+  S.profile.email=gV('prEmail');S.profile.address=gV('prAddress');
+  S.profile.facebook=gV('prFacebook');S.profile.instagram=gV('prInstagram');S.profile.youtube=gV('prYoutube');
+  if(S.profile.name)S.userName=S.profile.name;
+  saveS();updateProfilePreview();
+  showToast('\u2705 Profile saved!');
+  setTimeout(function(){showScreen('home');},700);
+}
+
+/* ===================== INIT ===================== */
+loadS();
+var firstLaunch=!LS.g('htz10');
+if(firstLaunch){showScreen('langselect');}
+else{applyLang(S.appLang,false);showScreen('home');}
+startGPS();updateMicUI();updateBadge();
+if(LS.g('htz_voice')==='1')startVoice();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>
